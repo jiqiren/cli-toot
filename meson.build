@@ -1,5 +1,5 @@
 project('cli-toot', 'c',
-  version : '1.0.2',
+  version : '1.0.3',
   default_options : [
     'c_std=c23',
     'warning_level=2',
@@ -9,8 +9,7 @@ project('cli-toot', 'c',
 
 curl_dep = dependency('libcurl', required : true)
 
-cjson_proj = subproject('cjson')
-cjson_dep = cjson_proj.get_variable('libcjson_dep')
+cjson_dep = dependency('libcjson', fallback : ['cjson', 'libcjson_dep'])
 
 common_args = []
 if host_machine.system() != 'darwin'
