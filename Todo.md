@@ -3,13 +3,13 @@
 Track v1 deliverables. Mark items off as they are completed and verified.
 
 ## 1. Project scaffolding
-- [ ] 1.1 Write `meson.build` (project, c_std=c23, warning_level=2, werror=true).
-- [ ] 1.2 Add `subprojects/cjson.wrap` pointing at WrapDB cJSON.
-- [ ] 1.3 Wire libcurl via `dependency('libcurl')`.
-- [ ] 1.4 Wire cJSON via `subproject('cjson')`.
-- [ ] 1.5 Platform source selection for `sha256_apple.c` (darwin) / `sha256_posix.c` (else).
-- [ ] 1.6 Add `dependency('libcrypto')` only on non-darwin.
-- [ ] 1.7 Empty-stub `src/main.c` so `meson setup build && meson compile -C build` succeeds end-to-end.
+- [x] 1.1 Write `meson.build` (project, c_std=c23, warning_level=2, werror=true).
+- [x] 1.2 Add `subprojects/cjson.wrap` pointing at WrapDB cJSON.
+- [x] 1.3 Wire libcurl via `dependency('libcurl')`.
+- [x] 1.4 Wire cJSON via `subproject('cjson')`.
+- [x] 1.5 Platform source selection for `sha256_apple.c` (darwin) / `sha256_posix.c` (else).
+- [x] 1.6 Add `dependency('libcrypto')` only on non-darwin.
+- [x] 1.7 Empty-stub `src/main.c` so `meson setup build && meson compile -C build` succeeds end-to-end.
 
 ## 2. Crypto + base64 helpers
 - [ ] 2.1 `src/sha256.h` declaring `void sha256_once(const uint8_t *data, size_t len, uint8_t out[32])`.
