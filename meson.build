@@ -17,6 +17,7 @@ src = files(
   'src/main.c',
   'src/base64.c',
   'src/http.c',
+  'src/json_helpers.c',
 )
 
 if host_machine.system() == 'darwin'

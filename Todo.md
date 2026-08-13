@@ -27,10 +27,10 @@ Track v1 deliverables. Mark items off as they are completed and verified.
 - [x] 3.5 curl global init / cleanup managed in `main.c`.
 
 ## 4. JSON helpers (cJSON)
-- [ ] 4.1 `src/json_helpers.h/.c` — `json_get_string(root, key)` returning `const char*` or nullptr.
-- [ ] 4.2 `json_get_int(root, key)`.
-- [ ] 4.3 Parse helper: `json_parse(const char *body, size_t len)` returning owned `cJSON*` (must free).
-- [ ] 4.4 Wrap cJSON free in a small RAII-ish helper or document caller responsibility.
+- [x] 4.1 `src/json_helpers.h/.c` — `json_get_string(root, key)` returning `const char*` or nullptr.
+- [x] 4.2 `json_get_int(root, key)`.
+- [x] 4.3 Parse helper: `json_parse(const char *body, size_t len)` returning owned `cJSON*` (must free).
+- [x] 4.4 Wrap cJSON free in a small RAII-ish helper or document caller responsibility.
 
 ## 5. Config storage
 - [ ] 5.1 `src/config.h/.c` — `config_path()` honoring `XDG_CONFIG_HOME` then `$HOME/.config`.
