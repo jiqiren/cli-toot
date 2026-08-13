@@ -49,6 +49,10 @@ To run a built binary: `./build/cli-toot <args>`.
 - Do not update git config, force-push, or amend.
 - Commit messages: concise, conventional-style (e.g. `feat: add login flow`, `fix: handle OOB fallback`).
 
+## Versioning
+- The project version lives in `meson.build` (`version : '...'`).
+- Every bugfix commit must increment the patch level (e.g. `1.0.0` → `1.0.1`). New features increment minor (`1.0.1` → `1.1.0`); breaking changes increment major.
+
 ## Things to NOT do
 - Do not add streaming/timeline/notification features — out of scope for v1.
 - Do not introduce a second TLS library.
