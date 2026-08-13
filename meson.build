@@ -19,6 +19,7 @@ src = files(
   'src/http.c',
   'src/json_helpers.c',
   'src/config.c',
+  'src/browser.c',
 )
 
 if host_machine.system() == 'darwin'

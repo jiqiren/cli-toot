@@ -40,8 +40,8 @@ Track v1 deliverables. Mark items off as they are completed and verified.
 - [x] 5.5 Never print `client_secret` / `access_token` in normal output.
 
 ## 6. Browser launch
-- [ ] 6.1 `src/browser.h/.c` — `open_browser(const char *url)`.
-- [ ] 6.2 macOS: `open`. Linux: `xdg-open`. Fail gracefully (return nonzero) if missing.
+- [x] 6.1 `src/browser.h/.c` — `open_browser(const char *url)`.
+- [x] 6.2 macOS: `open`. Linux: `xdg-open`. Fail gracefully (return nonzero) if missing.
 
 ## 7. Loopback HTTP server
 - [ ] 7.1 `src/loopback.h/.c` — bind `127.0.0.1:0`, return chosen port + `redirect_uri`.
