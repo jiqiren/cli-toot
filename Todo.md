@@ -44,10 +44,10 @@ Track v1 deliverables. Mark items off as they are completed and verified.
 - [x] 6.2 macOS: `open`. Linux: `xdg-open`. Fail gracefully (return nonzero) if missing.
 
 ## 7. Loopback HTTP server
-- [ ] 7.1 `src/loopback.h/.c` — bind `127.0.0.1:0`, return chosen port + `redirect_uri`.
-- [ ] 7.2 Serve one request, parse `?code=` and `&state=`, validate state, respond with HTML "you can close this", shutdown.
-- [ ] 7.3 Timeout: if no request within ~5 minutes, abort with error.
-- [ ] 7.4 Return code via out-param; thread-safe enough for single-shot use.
+- [x] 7.1 `src/loopback.h/.c` — bind `127.0.0.1:0`, return chosen port + `redirect_uri`.
+- [x] 7.2 Serve one request, parse `?code=` and `&state=`, validate state, respond with HTML "you can close this", shutdown.
+- [x] 7.3 Timeout: if no request within ~5 minutes, abort with error.
+- [x] 7.4 Return code via out-param; thread-safe enough for single-shot use.
 
 ## 8. OAuth flow (oauth.c)
 - [ ] 8.1 `src/oauth.h/.c` — `register_app(instance)` → fills `client_id`, `client_secret`.

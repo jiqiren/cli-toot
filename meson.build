@@ -20,6 +20,7 @@ src = files(
   'src/json_helpers.c',
   'src/config.c',
   'src/browser.c',
+  'src/loopback.c',
 )
 
 if host_machine.system() == 'darwin'
@@ -45,5 +46,10 @@ test('crypto', executable('crypto_test', 'tests/crypto_test.c',
 
 test('config', executable('config_test', 'tests/config_test.c',
   'src/config.c',
+  include_directories : 'src',
+))
+
+test('loopback', executable('loopback_test', 'tests/loopback_test.c',
+  'src/loopback.c',
   include_directories : 'src',
 ))
