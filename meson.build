@@ -1,5 +1,5 @@
 project('cli-toot', 'c',
-  version : '1.0.1',
+  version : '1.0.2',
   default_options : [
     'c_std=c23',
     'warning_level=2',
@@ -49,6 +49,7 @@ endif
 executable('cli-toot', src + version_h,
   dependencies : deps,
   c_args : common_args,
+  install : true,
 )
 
 test('crypto', executable('crypto_test', 'tests/crypto_test.c',
