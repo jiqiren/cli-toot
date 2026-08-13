@@ -18,6 +18,7 @@ src = files(
   'src/base64.c',
   'src/http.c',
   'src/json_helpers.c',
+  'src/config.c',
 )
 
 if host_machine.system() == 'darwin'
@@ -39,4 +40,9 @@ test('crypto', executable('crypto_test', 'tests/crypto_test.c',
   include_directories : 'src',
   dependencies : (host_machine.system() == 'darwin' ? []
                                                     : dependency('libcrypto')),
+))
+
+test('config', executable('config_test', 'tests/config_test.c',
+  'src/config.c',
+  include_directories : 'src',
 ))

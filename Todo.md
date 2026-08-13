@@ -33,11 +33,11 @@ Track v1 deliverables. Mark items off as they are completed and verified.
 - [x] 4.4 Wrap cJSON free in a small RAII-ish helper or document caller responsibility.
 
 ## 5. Config storage
-- [ ] 5.1 `src/config.h/.c` — `config_path()` honoring `XDG_CONFIG_HOME` then `$HOME/.config`.
-- [ ] 5.2 `config_load(struct config*)` parsing flat `key=value`.
-- [ ] 5.3 `config_save(const struct config*)` writing with mode 0600 (`open` + `fchmod`).
-- [ ] 5.4 `config_get(key)` accessor + getters for `instance`, `client_id`, `client_secret`, `access_token`, `account_id`, `username`.
-- [ ] 5.5 Never print `client_secret` / `access_token` in normal output.
+- [x] 5.1 `src/config.h/.c` — `config_path()` honoring `XDG_CONFIG_HOME` then `$HOME/.config`.
+- [x] 5.2 `config_load(struct config*)` parsing flat `key=value`.
+- [x] 5.3 `config_save(const struct config*)` writing with mode 0600 (`open` + `fchmod`).
+- [x] 5.4 `config_get(key)` accessor + getters for `instance`, `client_id`, `client_secret`, `access_token`, `account_id`, `username`.
+- [x] 5.5 Never print `client_secret` / `access_token` in normal output.
 
 ## 6. Browser launch
 - [ ] 6.1 `src/browser.h/.c` — `open_browser(const char *url)`.
