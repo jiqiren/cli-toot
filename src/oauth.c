@@ -226,7 +226,7 @@ int login(const char *instance_arg) {
 
   char redirect_uris_buf[512];
   if (use_loopback) {
-    snprintf(redirect_uris_buf, sizeof(redirect_uris_buf), "%s %s",
+    snprintf(redirect_uris_buf, sizeof(redirect_uris_buf), "%s\n%s",
              loopback_uri, OOB_REDIRECT_URI);
   } else {
     snprintf(redirect_uris_buf, sizeof(redirect_uris_buf), "%s",
@@ -280,6 +280,9 @@ int login(const char *instance_arg) {
     }
     close(lb_fd);
     code = r.code;
+    if (r.error != nullptr) {
+      fprintf(stderr, "error: authorization server returned: %s\n", r.error);
+    }
     free(r.error);
   } else {
     printf("After authorizing, paste the displayed code here:\n> ");

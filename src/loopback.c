@@ -124,6 +124,10 @@ bool loopback_accept_once(int fd, const char *state, int timeout_seconds,
     return false;
   }
 
+  if (getenv("CLI_TOOT_DEBUG") != nullptr) {
+    fprintf(stderr, "[debug] loopback raw request:\n%.*s\n", (int)n, buf);
+  }
+
   char *sp = strchr(buf, ' ');
   if (sp == nullptr) {
     write(c, html_err, strlen(html_err));
