@@ -50,25 +50,25 @@ Track v1 deliverables. Mark items off as they are completed and verified.
 - [x] 7.4 Return code via out-param; thread-safe enough for single-shot use.
 
 ## 8. OAuth flow (oauth.c)
-- [ ] 8.1 `src/oauth.h/.c` — `register_app(instance)` → fills `client_id`, `client_secret`.
-- [ ] 8.2 `build_authorize_url(...)` constructing `/oauth/authorize` query with PKCE + state.
-- [ ] 8.3 `exchange_token(...)` → `POST /oauth/token` returning `access_token`.
-- [ ] 8.4 `verify_credentials(token, instance)` → fills username + account_id.
-- [ ] 8.5 `login(instance)` orchestrator: register → PKCE gen → loopback (or OOB fallback) → open browser → capture → exchange → verify → save config.
+- [x] 8.1 `src/oauth.h/.c` — `register_app(instance)` → fills `client_id`, `client_secret`.
+- [x] 8.2 `build_authorize_url(...)` constructing `/oauth/authorize` query with PKCE + state.
+- [x] 8.3 `exchange_token(...)` → `POST /oauth/token` returning `access_token`.
+- [x] 8.4 `verify_credentials(token, instance)` → fills username + account_id.
+- [x] 8.5 `login(instance)` orchestrator: register → PKCE gen → loopback (or OOB fallback) → open browser → capture → exchange → verify → save config.
 
 ## 9. CLI dispatch (main.c)
-- [ ] 9.1 `main.c` arg parsing: `login <instance>`, `toot <text>`, `whoami`, `help`.
-- [ ] 9.2 `login` command — call `oauth.c::login`.
-- [ ] 9.3 `toot` command — call `toot.c::post_status`.
-- [ ] 9.4 `whoami` command — call `oauth.c::verify_credentials` and print handle.
-- [ ] 9.5 `help` / bare invocation — usage text, exit 1.
-- [ ] 9.6 Exit codes: 0 ok, 1 usage, 2 not-logged-in, 3 network/HTTP error.
+- [x] 9.1 `main.c` arg parsing: `login <instance>`, `toot <text>`, `whoami`, `help`.
+- [x] 9.2 `login` command — call `oauth.c::login`.
+- [x] 9.3 `toot` command — call `toot.c::post_status`.
+- [x] 9.4 `whoami` command — call `oauth.c::verify_credentials` and print handle.
+- [x] 9.5 `help` / bare invocation — usage text, exit 1.
+- [x] 9.6 Exit codes: 0 ok, 1 usage, 2 not-logged-in, 3 network/HTTP error.
 
 ## 10. Toot posting
-- [ ] 10.1 `src/toot.h/.c` — `post_status(instance, token, text)` → `POST /api/v1/statuses`.
-- [ ] 10.2 URL-encode status text.
-- [ ] 10.3 On success, parse `Status.url` and print it.
-- [ ] 10.4 On non-2xx, print error + body, exit 3.
+- [x] 10.1 `src/toot.h/.c` — `post_status(instance, token, text)` → `POST /api/v1/statuses`.
+- [x] 10.2 URL-encode status text.
+- [x] 10.3 On success, parse `Status.url` and print it.
+- [x] 10.4 On non-2xx, print error + body, exit 3.
 
 ## 11. Build & verification
 - [ ] 11.1 `meson setup build && meson compile -C build` clean under `-Werror c_std=c23`.

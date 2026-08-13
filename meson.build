@@ -21,6 +21,8 @@ src = files(
   'src/config.c',
   'src/browser.c',
   'src/loopback.c',
+  'src/oauth.c',
+  'src/toot.c',
 )
 
 if host_machine.system() == 'darwin'

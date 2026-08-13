@@ -28,3 +28,5 @@ void http_global_cleanup(void);
                             http_response *resp);
 
 void http_response_free(http_response *resp);
+
+[[nodiscard]] char *urlencode(const char *s);

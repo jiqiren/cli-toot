@@ -16,6 +16,28 @@ void http_response_free(http_response *resp) {
   resp->len = 0;
 }
 
+char *urlencode(const char *s) {
+  if (s == nullptr) return nullptr;
+  static const char hex[] = "0123456789ABCDEF";
+  size_t n = strlen(s);
+  char *out = malloc(n * 3 + 1);
+  if (out == nullptr) return nullptr;
+  size_t j = 0;
+  for (size_t i = 0; i < n; i++) {
+    unsigned char c = (unsigned char)s[i];
+    if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
+        (c >= '0' && c <= '9') || c == '-' || c == '_' || c == '.' || c == '~') {
+      out[j++] = (char)c;
+    } else {
+      out[j++] = '%';
+      out[j++] = hex[c >> 4];
+      out[j++] = hex[c & 0x0F];
+    }
+  }
+  out[j] = '\0';
+  return out;
+}
+
 static size_t write_cb(char *ptr, size_t size, size_t nmemb, void *ud) {
   size_t realsize = size * nmemb;
   http_response *resp = (http_response *)ud;
