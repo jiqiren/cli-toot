@@ -20,6 +20,19 @@ Then run `cli-toot login <instance>` to get started.
 
 The app registers itself with Mastodon as `cli ToooT` (exact spelling intentional).
 
+## Quick start
+
+```sh
+brew install jiqiren/tap/cli-toot
+cli-toot login fosstodon.org
+# browser opens → authorize → "Logged in as @you@fosstodon.org"
+
+cli-toot toot "hello from cli-toot"
+# https://fosstodon.org/@you/...
+```
+
+Works with both Mastodon and GoToSocial instances.
+
 ## Login flow
 
 `login` uses PKCE (`S256`) with a loopback HTTP server by default:
@@ -33,9 +46,11 @@ The app registers itself with Mastodon as `cli ToooT` (exact spelling intentiona
 
 If the loopback server can't bind, it falls back to the OOB flow: the instance displays a code on a page and you paste it into the CLI.
 
-## Build
+Set `CLI_TOOT_DEBUG=1` to have the loopback server print the raw callback request to stderr — useful for diagnosing OAuth errors.
 
-Requires Meson, pkg-config, libcurl, and (on Linux) libcrypto/openssl dev headers. cJSON is fetched automatically via a Meson subproject wrap.
+## Build from source
+
+Requires Meson, pkg-config, libcurl, and (on Linux) libcrypto/openssl dev headers. cJSON is fetched automatically via a Meson subproject wrap (or use a system-installed `cjson`).
 
 ### macOS (Homebrew)
 
@@ -52,19 +67,6 @@ meson setup build && meson compile -C build
 ```
 
 The build uses `c_std=c23`, `warning_level=2`, and `werror=true` — it must compile cleanly under `-Wall -Wextra -Werror`.
-
-## Use
-
-```sh
-./build/cli-toot login fosstodon.org
-# browser opens → authorize → "Logged in as @you@fosstodon.org"
-
-./build/cli-toot whoami
-# @you@fosstodon.org
-
-./build/cli-toot toot "hello from cli-toot"
-# https://fosstodon.org/@you/...
-```
 
 ### Config
 
@@ -85,6 +87,7 @@ cli-toot/
 ├── subprojects/cjson.wrap
 ├── src/
 │   ├── main.c            CLI dispatch
+│   ├── version.h.in      version template (Meson generates version.h)
 │   ├── oauth.{c,h}       app registration, PKCE, token exchange, login
 │   ├── toot.{c,h}        post a status
 │   ├── http.{c,h}        libcurl helpers (form/json/get, urlencode)
@@ -100,7 +103,8 @@ cli-toot/
 │   └── loopback_test.c
 ├── Spec.md
 ├── AGENTS.md
-└── Todo.md
+├── README.md
+└── LICENSE
 ```
 
 ## Running tests
@@ -112,6 +116,6 @@ meson test -C build
 ## Dependencies
 
 - [libcurl](https://curl.se/) — HTTP/TLS, via pkg-config.
-- [cJSON](https://github.com/DaveGamble/cJSON) — JSON, via Meson wrap (auto-fetched).
+- [cJSON](https://github.com/DaveGamble/cJSON) — JSON, via Meson wrap (auto-fetched) or system `cjson` formula.
 - SHA-256: CommonCrypto on macOS, libcrypto (`SHA256()`) on Linux. No vendored crypto.
 - Random bytes: `/dev/urandom`.

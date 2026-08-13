@@ -1,84 +1,22 @@
-# Todo — cli-toot implementation
+# Todo — cli-toot
 
-Track v1 deliverables. Mark items off as they are completed and verified.
+All v1 tasks complete. Current version: 1.0.3.
 
-## 1. Project scaffolding
-- [x] 1.1 Write `meson.build` (project, c_std=c23, warning_level=2, werror=true).
-- [x] 1.2 Add `subprojects/cjson.wrap` pointing at WrapDB cJSON.
-- [x] 1.3 Wire libcurl via `dependency('libcurl')`.
-- [x] 1.4 Wire cJSON via `subproject('cjson')`.
-- [x] 1.5 Platform source selection for `sha256_apple.c` (darwin) / `sha256_posix.c` (else).
-- [x] 1.6 Add `dependency('libcrypto')` only on non-darwin.
-- [x] 1.7 Empty-stub `src/main.c` so `meson setup build && meson compile -C build` succeeds end-to-end.
-
-## 2. Crypto + base64 helpers
-- [x] 2.1 `src/sha256.h` declaring `void sha256_once(const uint8_t *data, size_t len, uint8_t out[32])`.
-- [x] 2.2 `src/sha256_apple.c` implementing via `CC_SHA256`.
-- [x] 2.3 `src/sha256_posix.c` implementing via `SHA256()` (openssl/sha.h).
-- [x] 2.4 `src/base64.h/.c` — `base64url_encode(const uint8_t*, size_t)` (no padding).
-- [x] 2.5 `src/base64.c` — `random_verifier()`: read 32 bytes from `/dev/urandom`, base64url → 43-char verifier.
-- [x] 2.6 Smoke test the digest against a NIST vector (`"abc" → ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad`).
-
-## 3. HTTP layer (libcurl)
-- [x] 3.1 `src/http.h/.c` — `http_post_form(url, form_fields[], bearer, &resp)` returning long http_code; fills response body buffer.
-- [x] 3.2 `http_get(url, bearer, &resp)` variant.
-- [x] 3.3 `http_post_json(url, json_body, bearer, &resp)` variant (used later for statuses if needed).
-- [x] 3.4 Error path: non-2xx returns 3, body preserved for caller to print.
-- [x] 3.5 curl global init / cleanup managed in `main.c`.
-
-## 4. JSON helpers (cJSON)
-- [x] 4.1 `src/json_helpers.h/.c` — `json_get_string(root, key)` returning `const char*` or nullptr.
-- [x] 4.2 `json_get_int(root, key)`.
-- [x] 4.3 Parse helper: `json_parse(const char *body, size_t len)` returning owned `cJSON*` (must free).
-- [x] 4.4 Wrap cJSON free in a small RAII-ish helper or document caller responsibility.
-
-## 5. Config storage
-- [x] 5.1 `src/config.h/.c` — `config_path()` honoring `XDG_CONFIG_HOME` then `$HOME/.config`.
-- [x] 5.2 `config_load(struct config*)` parsing flat `key=value`.
-- [x] 5.3 `config_save(const struct config*)` writing with mode 0600 (`open` + `fchmod`).
-- [x] 5.4 `config_get(key)` accessor + getters for `instance`, `client_id`, `client_secret`, `access_token`, `account_id`, `username`.
-- [x] 5.5 Never print `client_secret` / `access_token` in normal output.
-
-## 6. Browser launch
-- [x] 6.1 `src/browser.h/.c` — `open_browser(const char *url)`.
-- [x] 6.2 macOS: `open`. Linux: `xdg-open`. Fail gracefully (return nonzero) if missing.
-
-## 7. Loopback HTTP server
-- [x] 7.1 `src/loopback.h/.c` — bind `127.0.0.1:0`, return chosen port + `redirect_uri`.
-- [x] 7.2 Serve one request, parse `?code=` and `&state=`, validate state, respond with HTML "you can close this", shutdown.
-- [x] 7.3 Timeout: if no request within ~5 minutes, abort with error.
-- [x] 7.4 Return code via out-param; thread-safe enough for single-shot use.
-
-## 8. OAuth flow (oauth.c)
-- [x] 8.1 `src/oauth.h/.c` — `register_app(instance)` → fills `client_id`, `client_secret`.
-- [x] 8.2 `build_authorize_url(...)` constructing `/oauth/authorize` query with PKCE + state.
-- [x] 8.3 `exchange_token(...)` → `POST /oauth/token` returning `access_token`.
-- [x] 8.4 `verify_credentials(token, instance)` → fills username + account_id.
-- [x] 8.5 `login(instance)` orchestrator: register → PKCE gen → loopback (or OOB fallback) → open browser → capture → exchange → verify → save config.
-
-## 9. CLI dispatch (main.c)
-- [x] 9.1 `main.c` arg parsing: `login <instance>`, `toot <text>`, `whoami`, `help`.
-- [x] 9.2 `login` command — call `oauth.c::login`.
-- [x] 9.3 `toot` command — call `toot.c::post_status`.
-- [x] 9.4 `whoami` command — call `oauth.c::verify_credentials` and print handle.
-- [x] 9.5 `help` / bare invocation — usage text, exit 1.
-- [x] 9.6 Exit codes: 0 ok, 1 usage, 2 not-logged-in, 3 network/HTTP error.
-
-## 10. Toot posting
-- [x] 10.1 `src/toot.h/.c` — `post_status(instance, token, text)` → `POST /api/v1/statuses`.
-- [x] 10.2 URL-encode status text.
-- [x] 10.3 On success, parse `Status.url` and print it.
-- [x] 10.4 On non-2xx, print error + body, exit 3.
-
-## 11. Build & verification
-- [x] 11.1 `meson setup build && meson compile -C build` clean under `-Werror c_std=c23`.
-- [x] 11.2 `./build/cli-toot help` prints usage.
-- [ ] 11.3 `./build/cli-toot login fosstodon.org` end-to-end: browser opens, token stored, `whoami` prints handle. *(requires live Mastodon instance + user interaction — manual)*
-- [ ] 11.4 `./build/cli-toot toot "hello from cli-toot"` — post visible on instance. *(requires login first — manual)*
-- [ ] 11.5 Force OOB fallback (loopback bind failure) — paste-code flow works. *(manual)*
-- [ ] 11.6 Linux smoke: `xdg-open`, `/dev/urandom`, libcrypto link all functional. *(requires Linux box — manual)*
-
-## 12. Polish
-- [x] 12.1 `README.md` with install + usage (only if requested). *(skipped — not requested)*
-- [x] 12.2 `.gitignore` for `build/` and `subprojects/cjson*/`.
-- [x] 12.3 Final review pass against `Spec.md` + `AGENTS.md`. *(corrected redirect_uri bug: bind loopback before register_app so the registered URI matches the bound port; updated Spec.md to match)*
+## Completed
+- [x] Project scaffolding (meson.build, cjson.wrap, libcurl, cJSON, platform sha256, stub main.c)
+- [x] Crypto + base64 helpers (sha256 shim, base64url, random verifier, NIST test vector)
+- [x] HTTP layer (libcurl: post_form, get, post_json, urlencode)
+- [x] JSON helpers (cJSON wrappers: parse, get_string, get_int)
+- [x] Config storage (XDG path, load/save key=value, 0600 mode)
+- [x] Browser launch (open / xdg-open)
+- [x] Loopback HTTP server (127.0.0.1:0, state validation, callback capture)
+- [x] OAuth flow (register_app, PKCE, authorize URL, token exchange, verify_credentials, login orchestrator)
+- [x] CLI dispatch (login / toot / whoami / version / help, exit codes)
+- [x] Toot posting (POST /api/v1/statuses, print URL)
+- [x] Build & verification (clean -Werror c23 build, 25 tests pass, smoke tests)
+- [x] Polish (README, .gitignore, Spec/AGENTS review)
+- [x] GoToSocial compatibility (newline-joined redirect_uris)
+- [x] Version flag (--version / -V / version)
+- [x] Linux build fix (_GNU_SOURCE for POSIX functions)
+- [x] Meson install support (install : true)
+- [x] Homebrew tap (jiqiren/homebrew-tap, formula, bottles)
