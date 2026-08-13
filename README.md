@@ -2,6 +2,14 @@
 
 A minimal command-line Mastodon client for sending quick toots, written in pure C23. Targets macOS and Linux.
 
+## Install
+
+```sh
+brew install jiqiren/tap/cli-toot
+```
+
+Then run `cli-toot login <instance>` to get started.
+
 ## What it does
 
 - `cli-toot login <instance>` — run the Mastodon OAuth login dance and store a Bearer token.
