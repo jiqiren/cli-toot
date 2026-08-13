@@ -16,6 +16,7 @@ deps = [curl_dep, cjson_dep]
 src = files(
   'src/main.c',
   'src/base64.c',
+  'src/http.c',
 )
 
 if host_machine.system() == 'darwin'

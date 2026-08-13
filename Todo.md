@@ -20,11 +20,11 @@ Track v1 deliverables. Mark items off as they are completed and verified.
 - [x] 2.6 Smoke test the digest against a NIST vector (`"abc" → ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad`).
 
 ## 3. HTTP layer (libcurl)
-- [ ] 3.1 `src/http.h/.c` — `http_post_form(url, form_fields[], bearer, &resp)` returning long http_code; fills response body buffer.
-- [ ] 3.2 `http_get(url, bearer, &resp)` variant.
-- [ ] 3.3 `http_post_json(url, json_body, bearer, &resp)` variant (used later for statuses if needed).
-- [ ] 3.4 Error path: non-2xx returns 3, body preserved for caller to print.
-- [ ] 3.5 curl global init / cleanup managed in `main.c`.
+- [x] 3.1 `src/http.h/.c` — `http_post_form(url, form_fields[], bearer, &resp)` returning long http_code; fills response body buffer.
+- [x] 3.2 `http_get(url, bearer, &resp)` variant.
+- [x] 3.3 `http_post_json(url, json_body, bearer, &resp)` variant (used later for statuses if needed).
+- [x] 3.4 Error path: non-2xx returns 3, body preserved for caller to print.
+- [x] 3.5 curl global init / cleanup managed in `main.c`.
 
 ## 4. JSON helpers (cJSON)
 - [ ] 4.1 `src/json_helpers.h/.c` — `json_get_string(root, key)` returning `const char*` or nullptr.
