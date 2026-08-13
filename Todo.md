@@ -71,12 +71,12 @@ Track v1 deliverables. Mark items off as they are completed and verified.
 - [x] 10.4 On non-2xx, print error + body, exit 3.
 
 ## 11. Build & verification
-- [ ] 11.1 `meson setup build && meson compile -C build` clean under `-Werror c_std=c23`.
-- [ ] 11.2 `./build/cli-toot help` prints usage.
-- [ ] 11.3 `./build/cli-toot login fosstodon.org` end-to-end: browser opens, token stored, `whoami` prints handle.
-- [ ] 11.4 `./build/cli-toot toot "hello from cli-toot"` — post visible on instance.
-- [ ] 11.5 Force OOB fallback (loopback bind failure) — paste-code flow works.
-- [ ] 11.6 Linux smoke: `xdg-open`, `/dev/urandom`, libcrypto link all functional.
+- [x] 11.1 `meson setup build && meson compile -C build` clean under `-Werror c_std=c23`.
+- [x] 11.2 `./build/cli-toot help` prints usage.
+- [ ] 11.3 `./build/cli-toot login fosstodon.org` end-to-end: browser opens, token stored, `whoami` prints handle. *(requires live Mastodon instance + user interaction — manual)*
+- [ ] 11.4 `./build/cli-toot toot "hello from cli-toot"` — post visible on instance. *(requires login first — manual)*
+- [ ] 11.5 Force OOB fallback (loopback bind failure) — paste-code flow works. *(manual)*
+- [ ] 11.6 Linux smoke: `xdg-open`, `/dev/urandom`, libcrypto link all functional. *(requires Linux box — manual)*
 
 ## 12. Polish
 - [ ] 12.1 `README.md` with install + usage (only if requested).
