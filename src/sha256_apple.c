@@ -1,7 +1,10 @@
 #include "sha256.h"
 
+#include <CommonCrypto/CommonDigest.h>
+
 void sha256_once(const uint8_t *data, size_t len, uint8_t out[32]) {
-  (void)data;
-  (void)len;
-  for (int i = 0; i < 32; i++) out[i] = 0;
+  CC_SHA256_CTX ctx;
+  CC_SHA256_Init(&ctx);
+  CC_SHA256_Update(&ctx, data, (CC_LONG)len);
+  CC_SHA256_Final(out, &ctx);
 }

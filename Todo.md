@@ -12,12 +12,12 @@ Track v1 deliverables. Mark items off as they are completed and verified.
 - [x] 1.7 Empty-stub `src/main.c` so `meson setup build && meson compile -C build` succeeds end-to-end.
 
 ## 2. Crypto + base64 helpers
-- [ ] 2.1 `src/sha256.h` declaring `void sha256_once(const uint8_t *data, size_t len, uint8_t out[32])`.
-- [ ] 2.2 `src/sha256_apple.c` implementing via `CC_SHA256`.
-- [ ] 2.3 `src/sha256_posix.c` implementing via `SHA256()` (openssl/sha.h).
-- [ ] 2.4 `src/base64.h/.c` — `base64url_encode(const uint8_t*, size_t)` (no padding).
-- [ ] 2.5 `src/base64.c` — `random_verifier()`: read 32 bytes from `/dev/urandom`, base64url → 43-char verifier.
-- [ ] 2.6 Smoke test the digest against a NIST vector (`"abc" → ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad`).
+- [x] 2.1 `src/sha256.h` declaring `void sha256_once(const uint8_t *data, size_t len, uint8_t out[32])`.
+- [x] 2.2 `src/sha256_apple.c` implementing via `CC_SHA256`.
+- [x] 2.3 `src/sha256_posix.c` implementing via `SHA256()` (openssl/sha.h).
+- [x] 2.4 `src/base64.h/.c` — `base64url_encode(const uint8_t*, size_t)` (no padding).
+- [x] 2.5 `src/base64.c` — `random_verifier()`: read 32 bytes from `/dev/urandom`, base64url → 43-char verifier.
+- [x] 2.6 Smoke test the digest against a NIST vector (`"abc" → ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad`).
 
 ## 3. HTTP layer (libcurl)
 - [ ] 3.1 `src/http.h/.c` — `http_post_form(url, form_fields[], bearer, &resp)` returning long http_code; fills response body buffer.

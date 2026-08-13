@@ -13,18 +13,28 @@ cjson_proj = subproject('cjson')
 cjson_dep = cjson_proj.get_variable('libcjson_dep')
 
 deps = [curl_dep, cjson_dep]
-sources = files(
+src = files(
   'src/main.c',
+  'src/base64.c',
 )
 
 if host_machine.system() == 'darwin'
-  sources += files('src/sha256_apple.c')
+  src += files('src/sha256_apple.c')
 else
   crypto_dep = dependency('libcrypto', required : true)
   deps += [crypto_dep]
-  sources += files('src/sha256_posix.c')
+  src += files('src/sha256_posix.c')
 endif
 
-executable('cli-toot', sources,
+executable('cli-toot', src,
   dependencies : deps,
 )
+
+test('crypto', executable('crypto_test', 'tests/crypto_test.c',
+  'src/base64.c',
+  (host_machine.system() == 'darwin' ? files('src/sha256_apple.c')
+                                     : files('src/sha256_posix.c')),
+  include_directories : 'src',
+  dependencies : (host_machine.system() == 'darwin' ? []
+                                                    : dependency('libcrypto')),
+))
