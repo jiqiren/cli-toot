@@ -13,7 +13,8 @@ typedef struct {
 
 void app_credentials_free(app_credentials *c);
 
-[[nodiscard]] bool register_app(const char *instance, app_credentials *out);
+[[nodiscard]] bool register_app(const char *instance, const char *redirect_uris,
+                                app_credentials *out);
 
 [[nodiscard]] char *build_authorize_url(const char *instance,
                                          const char *client_id,

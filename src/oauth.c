@@ -28,7 +28,8 @@ void app_credentials_free(app_credentials *c) {
   c->client_secret = nullptr;
 }
 
-bool register_app(const char *instance, app_credentials *out) {
+bool register_app(const char *instance, const char *redirect_uris,
+                   app_credentials *out) {
   out->client_id = nullptr;
   out->client_secret = nullptr;
 
@@ -37,7 +38,7 @@ bool register_app(const char *instance, app_credentials *out) {
 
   http_field fields[] = {
       {"client_name", CLI_CLIENT_NAME},
-      {"redirect_uris", "http://127.0.0.1:0/callback " OOB_REDIRECT_URI},
+      {"redirect_uris", redirect_uris},
       {"scopes", CLI_SCOPES},
   };
 
@@ -201,12 +202,6 @@ int login(const char *instance_arg) {
     snprintf(instance, sizeof(instance), "https://%s", instance_arg);
   }
 
-  app_credentials app = {0};
-  if (!register_app(instance, &app)) {
-    fprintf(stderr, "error: failed to register app with %s\n", instance);
-    return 3;
-  }
-
   char *verifier = random_verifier(32);
   char *challenge = build_challenge(verifier, nullptr);
   char *state = gen_state();
@@ -214,20 +209,39 @@ int login(const char *instance_arg) {
     free(verifier);
     free(challenge);
     free(state);
-    app_credentials_free(&app);
     return 3;
   }
 
   uint16_t port = 0;
   int lb_fd = -1;
-  const char *redirect_uri;
   char *loopback_uri = nullptr;
+  const char *redirect_uri;
   bool use_loopback = loopback_listen(&port, &lb_fd);
   if (use_loopback) {
     loopback_uri = loopback_redirect_uri(port);
     redirect_uri = loopback_uri;
   } else {
     redirect_uri = OOB_REDIRECT_URI;
+  }
+
+  char redirect_uris_buf[512];
+  if (use_loopback) {
+    snprintf(redirect_uris_buf, sizeof(redirect_uris_buf), "%s %s",
+             loopback_uri, OOB_REDIRECT_URI);
+  } else {
+    snprintf(redirect_uris_buf, sizeof(redirect_uris_buf), "%s",
+             OOB_REDIRECT_URI);
+  }
+
+  app_credentials app = {0};
+  if (!register_app(instance, redirect_uris_buf, &app)) {
+    fprintf(stderr, "error: failed to register app with %s\n", instance);
+    if (use_loopback) close(lb_fd);
+    free(loopback_uri);
+    free(verifier);
+    free(challenge);
+    free(state);
+    return 3;
   }
 
   char *auth_url = build_authorize_url(instance, app.client_id, redirect_uri,

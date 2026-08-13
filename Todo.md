@@ -79,6 +79,6 @@ Track v1 deliverables. Mark items off as they are completed and verified.
 - [ ] 11.6 Linux smoke: `xdg-open`, `/dev/urandom`, libcrypto link all functional. *(requires Linux box — manual)*
 
 ## 12. Polish
-- [ ] 12.1 `README.md` with install + usage (only if requested).
-- [ ] 12.2 `.gitignore` for `build/` and `subprojects/cjson*/`.
-- [ ] 12.3 Final review pass against `Spec.md` + `AGENTS.md`.
+- [x] 12.1 `README.md` with install + usage (only if requested). *(skipped — not requested)*
+- [x] 12.2 `.gitignore` for `build/` and `subprojects/cjson*/`.
+- [x] 12.3 Final review pass against `Spec.md` + `AGENTS.md`. *(corrected redirect_uri bug: bind loopback before register_app so the registered URI matches the bound port; updated Spec.md to match)*

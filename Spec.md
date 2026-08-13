@@ -25,7 +25,7 @@ A minimal command-line Mastodon client for sending quick toots, written in pure 
 
 ## App identity
 - `client_name` sent to Mastodon during app registration: **`cli ToooT`** (exact casing/spelling).
-- `redirect_uris`: `http://127.0.0.1:0/callback urn:ietf:wg:oauth:2.0:oob`.
+- `redirect_uris`: registered dynamically to match the bound loopback port (see login flow); OOB URI is always included as a fallback.
 - `scopes`: `read write`.
 
 ## Commands
@@ -35,12 +35,12 @@ Performs the full Mastodon OAuth login dance and persists credentials.
 
 Flow (default PKCE + loopback, OOB fallback):
 1. Validate `instance` arg (required). Normalize to `https://<instance>`.
-2. **Register app** — `POST /api/v1/apps` with `client_name="cli ToooT"`, the `redirect_uris` above, `scopes="read write"`. Parse `client_id`, `client_secret`.
-3. **Generate PKCE:**
+2. **Bind loopback HTTP server** on `127.0.0.1:0` (ephemeral port) first. `redirect_uri = http://127.0.0.1:<port>/callback`.
+   - If bind fails → fall back to OOB: `redirect_uri = urn:ietf:wg:oauth:2.0:oob`.
+3. **Register app** — `POST /api/v1/apps` with `client_name="cli ToooT"`, `redirect_uris` set to the exact bound `redirect_uri` plus `urn:ietf:wg:oauth:2.0:oob` (OOB only, on fallback), `scopes="read write"`. Parse `client_id`, `client_secret`. (Binding first lets us register the exact URI Mastodon will match at authorize time.)
+4. **Generate PKCE:**
    - `code_verifier` = base64url(32 random bytes from `/dev/urandom`) → 43 chars.
    - `code_challenge` = base64url(SHA-256(verifier)), `code_challenge_method = S256`.
-4. **Bind loopback HTTP server** on `127.0.0.1:0` (ephemeral port). `redirect_uri = http://127.0.0.1:<port>/callback`.
-   - If bind fails → fall back to OOB: `redirect_uri = urn:ietf:wg:oauth:2.0:oob`, prompt user to paste the code.
 5. **Open browser** to `GET /oauth/authorize?response_type=code&client_id=...&redirect_uri=<enc>&scope=read+write&code_challenge=...&code_challenge_method=S256&state=<rand>`.
    - macOS: `open <url>`. Linux: `xdg-open <url>`.
 6. **Capture code:** loopback server accepts exactly one request, validates `state`, extracts `code`, responds with a small HTML "you can close this" page, then shuts down. (OOB fallback: read code from stdin.)
