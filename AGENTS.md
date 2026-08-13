@@ -20,7 +20,7 @@ cli-toot: a minimal C23 CLI Mastodon client. See `Spec.md` for the full specific
 ## File layout convention
 - One concern per `.c`/`.h` pair (see `Spec.md` layout).
 - Headers guard with `#pragma once`.
-- No comments in code unless explicitly requested.
+- Comments explaining how code works are welcome. Do not leave commented-out code or noise.
 
 ## Meson rules
 - Source files per platform are selected via `host_machine.system()`: `'darwin'` → `sha256_apple.c`, else `sha256_posix.c`.
@@ -53,5 +53,5 @@ To run a built binary: `./build/cli-toot <args>`.
 - Do not add streaming/timeline/notification features — out of scope for v1.
 - Do not introduce a second TLS library.
 - Do not vendor JSON or crypto libs.
-- Do not add comments to source files.
+- Do not leave commented-out code or noise in source files.
 - Do not create a README unless asked.
