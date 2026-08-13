@@ -7,6 +7,7 @@ A minimal command-line Mastodon client for sending quick toots, written in pure 
 - `cli-toot login <instance>` — run the Mastodon OAuth login dance and store a Bearer token.
 - `cli-toot toot "<text>"` — post a new public status.
 - `cli-toot whoami` — show the logged-in account handle.
+- `cli-toot version` — show version (`--version` / `-V` also work).
 - `cli-toot help` — print usage.
 
 The app registers itself with Mastodon as `cli ToooT` (exact spelling intentional).

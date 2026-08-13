@@ -7,6 +7,7 @@
 #include "json_helpers.h"
 #include "oauth.h"
 #include "toot.h"
+#include "version.h"
 
 static void print_usage(const char *prog) {
   fprintf(stderr,
@@ -16,7 +17,8 @@ static void print_usage(const char *prog) {
           "  login <instance>   authenticate with a Mastodon instance\n"
           "  toot \"<text>\"      post a new status\n"
           "  whoami             show the logged-in account\n"
-          "  help               show this help\n",
+          "  help               show this help\n"
+          "  version            show version\n",
           prog);
 }
 
@@ -62,6 +64,11 @@ int main(int argc, char **argv) {
     }
   } else if (strcmp(argv[1], "whoami") == 0) {
     rc = cmd_whoami();
+  } else if (strcmp(argv[1], "version") == 0 ||
+             strcmp(argv[1], "--version") == 0 ||
+             strcmp(argv[1], "-V") == 0) {
+    printf("cli-toot %s\n", CLI_TOOT_VERSION);
+    rc = 0;
   } else if (strcmp(argv[1], "help") == 0 || strcmp(argv[1], "--help") == 0 ||
              strcmp(argv[1], "-h") == 0) {
     print_usage(argv[0]);

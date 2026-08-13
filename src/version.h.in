@@ -1,0 +1,3 @@
+#pragma once
+
+#define CLI_TOOT_VERSION "@CLI_TOOT_VERSION@"

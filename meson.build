@@ -1,5 +1,5 @@
 project('cli-toot', 'c',
-  version : '0.1.0',
+  version : '1.0.0',
   default_options : [
     'c_std=c23',
     'warning_level=2',
@@ -11,6 +11,14 @@ curl_dep = dependency('libcurl', required : true)
 
 cjson_proj = subproject('cjson')
 cjson_dep = cjson_proj.get_variable('libcjson_dep')
+
+conf_data = configuration_data()
+conf_data.set('CLI_TOOT_VERSION', meson.project_version())
+version_h = configure_file(
+  input : 'src/version.h.in',
+  output : 'version.h',
+  configuration : conf_data,
+)
 
 deps = [curl_dep, cjson_dep]
 src = files(
@@ -33,7 +41,7 @@ else
   src += files('src/sha256_posix.c')
 endif
 
-executable('cli-toot', src,
+executable('cli-toot', src + version_h,
   dependencies : deps,
 )
 
