@@ -131,6 +131,10 @@ bool exchange_token(const char *instance, const char *code,
   bool ok = http_post_form(url, fields, 6, nullptr, &resp);
   free(url);
   if (!ok || resp.code < 200 || resp.code >= 300) {
+    if (getenv("CLI_TOOT_DEBUG") != nullptr && resp.body != nullptr) {
+      fprintf(stderr, "[debug] token endpoint HTTP %ld: %.*s\n", resp.code,
+              (int)resp.len, resp.body);
+    }
     http_response_free(&resp);
     return false;
   }

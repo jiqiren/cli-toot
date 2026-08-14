@@ -69,25 +69,59 @@ static bool perform(CURL *curl, http_response *resp) {
 
 bool http_post_form(const char *url, const http_field *fields, size_t nfields,
                    const char *bearer, http_response *resp) {
-  CURL *curl = curl_easy_init();
-  if (curl == nullptr) return false;
-
-  curl_mime *form = curl_mime_init(curl);
+  /* OAuth token endpoints (and most REST APIs) require
+   * application/x-www-form-urlencoded. curl_mime would emit
+   * multipart/form-data, which Doorkeeper/Mastodon's /oauth/token
+   * rejects (RFC 6749 4.1.3). Build the urlencoded body by hand. */
+  size_t cap = 256;
+  char *body = malloc(cap);
+  if (body == nullptr) return false;
+  size_t len = 0;
+  bool first = true;
   for (size_t i = 0; i < nfields; i++) {
-    curl_mimepart *part = curl_mime_addpart(form);
-    curl_mime_name(part, fields[i].key);
-    curl_mime_data(part, fields[i].value, CURL_ZERO_TERMINATED);
+    char *e_val = urlencode(fields[i].value);
+    if (e_val == nullptr) {
+      free(body);
+      return false;
+    }
+    size_t need = len + (first ? 0 : 1) + strlen(fields[i].key) + 1 +
+                  strlen(e_val) + 1;
+    if (need > cap) {
+      while (cap < need) cap *= 2;
+      char *p = realloc(body, cap);
+      if (p == nullptr) {
+        free(e_val);
+        free(body);
+        return false;
+      }
+      body = p;
+    }
+    len += (size_t)snprintf(body + len, cap - len, "%s%s=%s",
+                            first ? "" : "&", fields[i].key, e_val);
+    first = false;
+    free(e_val);
   }
 
   struct curl_slist *hdrs = nullptr;
+  hdrs = curl_slist_append(hdrs,
+                           "Content-Type: application/x-www-form-urlencoded");
   if (bearer != nullptr) {
     char auth[512];
     snprintf(auth, sizeof(auth), "Authorization: Bearer %s", bearer);
     hdrs = curl_slist_append(hdrs, auth);
   }
 
+  CURL *curl = curl_easy_init();
+  if (curl == nullptr) {
+    curl_slist_free_all(hdrs);
+    free(body);
+    return false;
+  }
+
   curl_easy_setopt(curl, CURLOPT_URL, url);
-  curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
+  curl_easy_setopt(curl, CURLOPT_POST, 1L);
+  curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body);
+  curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)len);
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, hdrs);
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_cb);
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, resp);
@@ -96,9 +130,9 @@ bool http_post_form(const char *url, const http_field *fields, size_t nfields,
 
   bool ok = perform(curl, resp);
 
-  curl_mime_free(form);
   curl_slist_free_all(hdrs);
   curl_easy_cleanup(curl);
+  free(body);
   return ok;
 }
 

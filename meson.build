@@ -1,5 +1,5 @@
 project('cli-toot', 'c',
-  version : '1.1.0',
+  version : '1.1.1',
   default_options : [
     'c_std=c23',
     'warning_level=2',
