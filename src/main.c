@@ -14,7 +14,10 @@ static void print_usage(const char *prog) {
           "usage: %s <command> [args]\n"
           "\n"
           "commands:\n"
-          "  login <instance>   authenticate with a Mastodon instance\n"
+           "  login <instance> [--oob]\n"
+           "                     authenticate with a Mastodon instance\n"
+           "                     --oob skips the loopback server and uses\n"
+           "                     the out-of-band code paste flow\n"
           "  toot \"<text>\"      post a new status\n"
           "  whoami             show the logged-in account\n"
           "  help               show this help\n"
@@ -50,10 +53,28 @@ int main(int argc, char **argv) {
 
   if (strcmp(argv[1], "login") == 0) {
     if (argc < 3) {
-      fprintf(stderr, "usage: %s login <instance>\n", argv[0]);
+      fprintf(stderr, "usage: %s login <instance> [--oob]\n", argv[0]);
       rc = 1;
     } else {
-      rc = login(argv[2]);
+      bool force_oob = false;
+      const char *instance_arg = nullptr;
+      for (int i = 2; i < argc; i++) {
+        if (strcmp(argv[i], "--oob") == 0) {
+          force_oob = true;
+        } else if (instance_arg == nullptr) {
+          instance_arg = argv[i];
+        } else {
+          fprintf(stderr, "error: unexpected argument: %s\n", argv[i]);
+          rc = 1;
+          break;
+        }
+      }
+      if (rc == 0 && instance_arg == nullptr) {
+        fprintf(stderr, "usage: %s login <instance> [--oob]\n", argv[0]);
+        rc = 1;
+      } else if (rc == 0) {
+        rc = login(instance_arg, force_oob);
+      }
     }
   } else if (strcmp(argv[1], "toot") == 0) {
     if (argc < 3) {

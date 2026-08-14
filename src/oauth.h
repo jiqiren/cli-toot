@@ -35,4 +35,4 @@ void app_credentials_free(app_credentials *c);
                                        char **username_out,
                                        char **account_id_out);
 
-int login(const char *instance);
+int login(const char *instance, bool force_oob);

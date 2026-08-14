@@ -193,7 +193,7 @@ static char *gen_state(void) {
   return raw;
 }
 
-int login(const char *instance_arg) {
+int login(const char *instance_arg, bool force_oob) {
   char instance[512];
   if (strncmp(instance_arg, "http://", 7) == 0 ||
       strncmp(instance_arg, "https://", 8) == 0) {
@@ -216,7 +216,7 @@ int login(const char *instance_arg) {
   int lb_fd = -1;
   char *loopback_uri = nullptr;
   const char *redirect_uri;
-  bool use_loopback = loopback_listen(&port, &lb_fd);
+  bool use_loopback = !force_oob && loopback_listen(&port, &lb_fd);
   if (use_loopback) {
     loopback_uri = loopback_redirect_uri(port);
     redirect_uri = loopback_uri;
