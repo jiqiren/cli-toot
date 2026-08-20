@@ -1,7 +1,7 @@
-# AGENTS.md — guidance for opencode agents working on cli-toot
+# AGENTS.md — guidance for opencode agents working on sloptoot
 
 ## Project
-cli-toot: a minimal C23 CLI Mastodon client. See `Spec.md` for the full specification before doing anything.
+sloptoot: a minimal C23 CLI Mastodon client. See `Spec.md` for the full specification before doing anything.
 
 ## Toolchain
 - Build: **Meson**. Do not switch to CMake/Make.
@@ -36,12 +36,12 @@ cli-toot: a minimal C23 CLI Mastodon client. See `Spec.md` for the full specific
 - Always write config with mode 0600. Never print secrets (`access_token`, `client_secret`) in normal output.
 
 ## OAuth / network
-- `client_name` sent to Mastodon is **`cli ToooT`** (exact spelling — do not "fix" the typo).
+- `client_name` sent to Mastodon is **`slop TooT`** (exact casing/spelling — do not change it).
 - Default flow: PKCE (`S256`) + loopback server on `127.0.0.1:0`. OOB is a fallback only.
 - All API calls go over HTTPS via libcurl; always send `Authorization: Bearer <token>` for non-public endpoints.
 - `redirect_uris` must join multiple URIs with a **newline** (`\n`), not a space. GoToSocial splits on newline only; Mastodon accepts both. Newline works for both implementations.
 - The loopback server must be bound **before** `register_app` so the registered `redirect_uri` exactly matches the bound port. Mastodon and GoToSocial both require exact-match at authorize time.
-- The loopback server prints the raw callback request to stderr when `CLI_TOOT_DEBUG=1` is set — useful for diagnosing OAuth errors.
+- The loopback server prints the raw callback request to stderr when `SLOPTOOT_DEBUG=1` is set — useful for diagnosing OAuth errors.
 
 ## Build & verify commands (run before declaring done)
 ```sh
@@ -49,7 +49,7 @@ meson setup build && meson compile -C build
 ```
 Must compile cleanly. If it doesn't, fix before stopping.
 
-To run a built binary: `./build/cli-toot <args>`.
+To run a built binary: `./build/sloptoot <args>`.
 To run tests: `meson test -C build`.
 
 ## Git
@@ -64,8 +64,8 @@ To run tests: `meson test -C build`.
 
 ## Distribution (Homebrew)
 - The tap lives at `jiqiren/homebrew-tap` (https://github.com/jiqiren/homebrew-tap).
-- Users install with `brew install jiqiren/tap/cli-toot`.
-- The formula (`Formula/cli-toot.rb`) builds from the tagged release tarball, depends on `cjson` (system), and passes `--wrap-mode=nofallback` to `meson setup`.
+- Users install with `brew install jiqiren/tap/sloptoot`.
+- The formula (`Formula/sloptoot.rb`) builds from the tagged release tarball, depends on `cjson` (system), and passes `--wrap-mode=nofallback` to `meson setup`.
 - When releasing a new version: bump `meson.build` version, commit, tag `v<version>`, push the tag, create a GitHub release, compute the tarball SHA-256, and update the formula's `url`/`sha256`/`version` in the tap.
 
 ## Things to NOT do

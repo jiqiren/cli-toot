@@ -1,4 +1,4 @@
-project('cli-toot', 'c',
+project('sloptoot', 'c',
   version : '1.2.0',
   default_options : [
     'c_std=c23',
@@ -19,7 +19,7 @@ if host_machine.system() != 'darwin'
 endif
 
 conf_data = configuration_data()
-conf_data.set('CLI_TOOT_VERSION', meson.project_version())
+conf_data.set('SLOPTOOT_VERSION', meson.project_version())
 version_h = configure_file(
   input : 'src/version.h.in',
   output : 'version.h',
@@ -51,7 +51,7 @@ else
   src += files('src/sha256_posix.c')
 endif
 
-executable('cli-toot', src + version_h,
+executable('sloptoot', src + version_h,
   dependencies : deps,
   c_args : common_args,
   install : true,

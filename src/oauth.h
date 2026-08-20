@@ -3,7 +3,7 @@
 #include <stdbool.h>
 
 #define OOB_REDIRECT_URI "urn:ietf:wg:oauth:2.0:oob"
-#define CLI_CLIENT_NAME "cli ToooT"
+#define SLOPTOOT_CLIENT_NAME "slop TooT"
 #define CLI_SCOPES "read write"
 
 typedef struct {

@@ -58,7 +58,7 @@ static const char *html_ok =
     "Content-Type: text/html; charset=utf-8\r\n"
     "Connection: close\r\n"
     "\r\n"
-    "<!doctype html><html><head><title>cli-toot</title></head>"
+    "<!doctype html><html><head><title>sloptoot</title></head>"
     "<body><h2>Authorized. You can close this tab.</h2></body></html>\r\n";
 
 static const char *html_err =
@@ -66,7 +66,7 @@ static const char *html_err =
     "Content-Type: text/html; charset=utf-8\r\n"
     "Connection: close\r\n"
     "\r\n"
-    "<!doctype html><html><head><title>cli-toot</title></head>"
+    "<!doctype html><html><head><title>sloptoot</title></head>"
     "<body><h2>Authorization failed (state mismatch).</h2></body></html>\r\n";
 
 bool loopback_listen(uint16_t *port_out, int *fd_out) {
@@ -124,7 +124,7 @@ bool loopback_accept_once(int fd, const char *state, int timeout_seconds,
     return false;
   }
 
-  if (getenv("CLI_TOOT_DEBUG") != nullptr) {
+  if (getenv("SLOPTOOT_DEBUG") != nullptr) {
     fprintf(stderr, "[debug] loopback raw request:\n%.*s\n", (int)n, buf);
   }
 

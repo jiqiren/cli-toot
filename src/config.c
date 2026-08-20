@@ -31,16 +31,16 @@ char *config_path(void) {
   const char *xdg = getenv("XDG_CONFIG_HOME");
   const char *home;
   if (xdg != nullptr && xdg[0] != '\0') {
-    size_t n = strlen(xdg) + strlen("/cli-toot/config") + 1;
+    size_t n = strlen(xdg) + strlen("/sloptoot/config") + 1;
     char *p = malloc(n);
-    snprintf(p, n, "%s/cli-toot/config", xdg);
+    snprintf(p, n, "%s/sloptoot/config", xdg);
     return p;
   }
   home = getenv("HOME");
   if (home == nullptr || home[0] == '\0') return nullptr;
-  size_t n = strlen(home) + strlen("/.config/cli-toot/config") + 1;
+  size_t n = strlen(home) + strlen("/.config/sloptoot/config") + 1;
   char *p = malloc(n);
-  snprintf(p, n, "%s/.config/cli-toot/config", home);
+  snprintf(p, n, "%s/.config/sloptoot/config", home);
   return p;
 }
 

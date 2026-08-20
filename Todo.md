@@ -1,4 +1,4 @@
-# Todo — cli-toot
+# Todo — sloptoot
 
 Current version: 1.2.0 (unreleased — holds all features since the 1.1.1 release).
 

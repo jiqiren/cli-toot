@@ -37,7 +37,7 @@ bool register_app(const char *instance, const char *redirect_uris,
   if (url == nullptr) return false;
 
   http_field fields[] = {
-      {"client_name", CLI_CLIENT_NAME},
+      {"client_name", SLOPTOOT_CLIENT_NAME},
       {"redirect_uris", redirect_uris},
       {"scopes", CLI_SCOPES},
   };
@@ -131,7 +131,7 @@ bool exchange_token(const char *instance, const char *code,
   bool ok = http_post_form(url, fields, 6, nullptr, &resp);
   free(url);
   if (!ok || resp.code < 200 || resp.code >= 300) {
-    if (getenv("CLI_TOOT_DEBUG") != nullptr && resp.body != nullptr) {
+    if (getenv("SLOPTOOT_DEBUG") != nullptr && resp.body != nullptr) {
       fprintf(stderr, "[debug] token endpoint HTTP %ld: %.*s\n", resp.code,
               (int)resp.len, resp.body);
     }

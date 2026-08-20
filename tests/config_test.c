@@ -10,7 +10,7 @@ int main(void) {
   const char *tmp = getenv("XDG_CONFIG_HOME");
   (void)tmp;
 
-  char dir[] = "/tmp/cli-toot-test-XXXXXX";
+  char dir[] = "/tmp/sloptoot-test-XXXXXX";
   if (mkdtemp(dir) == nullptr) return 1;
 
   if (setenv("XDG_CONFIG_HOME", dir, 1) != 0) return 1;

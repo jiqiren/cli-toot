@@ -30,7 +30,7 @@ int post_status(const char *text, const char *in_reply_to_id, cache *db) {
   config c;
   config_init(&c);
   if (!config_load(&c) || c.access_token == nullptr || c.instance == nullptr) {
-    fprintf(stderr, "error: not logged in. Run `cli-toot login <instance>`.\n");
+    fprintf(stderr, "error: not logged in. Run `sloptoot login <instance>`.\n");
     config_free(&c);
     return 2;
   }
@@ -99,7 +99,7 @@ int delete_status(const char *ref, cache *db) {
   config c;
   config_init(&c);
   if (!config_load(&c) || c.access_token == nullptr || c.instance == nullptr) {
-    fprintf(stderr, "error: not logged in. Run `cli-toot login <instance>`.\n");
+    fprintf(stderr, "error: not logged in. Run `sloptoot login <instance>`.\n");
     config_free(&c);
     free(id);
     return 2;
@@ -189,7 +189,7 @@ int status_action(const char *ref, const char *action) {
   config c;
   config_init(&c);
   if (!config_load(&c) || c.access_token == nullptr || c.instance == nullptr) {
-    fprintf(stderr, "error: not logged in. Run `cli-toot login <instance>`.\n");
+    fprintf(stderr, "error: not logged in. Run `sloptoot login <instance>`.\n");
     config_free(&c);
     free(id);
     return 2;

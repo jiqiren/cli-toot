@@ -54,7 +54,7 @@ static int cmd_whoami(void) {
   config_init(&c);
   if (!config_load(&c) || c.access_token == nullptr || c.instance == nullptr ||
       c.username == nullptr) {
-    fprintf(stderr, "error: not logged in. Run `cli-toot login <instance>`.\n");
+    fprintf(stderr, "error: not logged in. Run `sloptoot login <instance>`.\n");
     config_free(&c);
     return 2;
   }
@@ -201,7 +201,7 @@ static int cmd_ls(int argc, char **argv) {
   config c;
   config_init(&c);
   if (!config_load(&c) || c.access_token == nullptr || c.instance == nullptr) {
-    fprintf(stderr, "error: not logged in. Run `cli-toot login <instance>`.\n");
+    fprintf(stderr, "error: not logged in. Run `sloptoot login <instance>`.\n");
     config_free(&c);
     return 2;
   }
@@ -215,7 +215,7 @@ static int cmd_ls(int argc, char **argv) {
 
 static int cmd_delete(int argc, char **argv) {
   if (argc < 3) {
-    fprintf(stderr, "usage: %s delete <id-or-url>\n", "cli-toot");
+    fprintf(stderr, "usage: %s delete <id-or-url>\n", "sloptoot");
     return 1;
   }
   if (argc > 3) {
@@ -231,7 +231,7 @@ static int cmd_delete(int argc, char **argv) {
 
 static int cmd_view(int argc, char **argv) {
   if (argc < 3) {
-    fprintf(stderr, "usage: %s view <id-or-url>\n", "cli-toot");
+    fprintf(stderr, "usage: %s view <id-or-url>\n", "sloptoot");
     return 1;
   }
   if (argc > 3) {
@@ -250,7 +250,7 @@ static const char *status_action_for(const char *label) {
 
 static int cmd_action(int argc, char **argv, const char *label) {
   if (argc < 3) {
-    fprintf(stderr, "usage: %s %s <id-or-url>\n", "cli-toot", label);
+    fprintf(stderr, "usage: %s %s <id-or-url>\n", "sloptoot", label);
     return 1;
   }
   if (argc > 3) {
@@ -313,7 +313,7 @@ int main(int argc, char **argv) {
   } else if (strcmp(argv[1], "version") == 0 ||
              strcmp(argv[1], "--version") == 0 ||
              strcmp(argv[1], "-V") == 0) {
-    printf("cli-toot %s\n", CLI_TOOT_VERSION);
+    printf("sloptoot %s\n", SLOPTOOT_VERSION);
     rc = 0;
   } else if (strcmp(argv[1], "help") == 0 || strcmp(argv[1], "--help") == 0 ||
              strcmp(argv[1], "-h") == 0) {

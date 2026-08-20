@@ -1,4 +1,4 @@
-# cli-toot — Specification
+# sloptoot — Specification
 
 A minimal command-line Mastodon client for sending quick toots, written in pure C23.
 
@@ -26,27 +26,27 @@ A minimal command-line Mastodon client for sending quick toots, written in pure 
 - **Feature macro (Linux):** `_GNU_SOURCE` is defined via `c_args` on non-darwin to expose POSIX functions (`fchmod`, `fdopen`) that glibc hides by default. macOS needs no such macro (defining `_POSIX_C_SOURCE` would hide BSD symbols like `INADDR_LOOPBACK` and `mkdtemp`).
 
 ## App identity
-- `client_name` sent to Mastodon during app registration: **`cli ToooT`** (exact casing/spelling).
+- `client_name` sent to Mastodon during app registration: **`slop TooT`** (exact casing/spelling).
 - `redirect_uris`: registered dynamically to match the bound loopback port (see login flow); OOB URI is always included as a fallback. Multiple URIs are joined with a **newline** (`\n`), not a space — GoToSocial splits `redirect_uris` on newline only, while Mastodon accepts both. Newline works for both implementations.
 - `scopes`: `read write`.
 
 ## Distribution
 - **Homebrew tap:** `jiqiren/homebrew-tap` (https://github.com/jiqiren/homebrew-tap).
-- Install with `brew install jiqiren/tap/cli-toot`.
-- The formula builds from a tagged GitHub release archive (`https://github.com/jiqiren/cli-toot/archive/refs/tags/v<version>.tar.gz`), verified with SHA-256.
+- Install with `brew install jiqiren/tap/sloptoot`.
+- The formula builds from a tagged GitHub release archive (`https://github.com/jiqiren/sloptoot/archive/refs/tags/v<version>.tar.gz`), verified with SHA-256.
 - Formula dependencies: `meson`, `ninja`, `pkgconf` (build); `curl`, `cjson` (runtime); `openssl@3` (runtime, Linux only).
 - The formula passes `meson setup` with `--wrap-mode=nofallback` so the system `cjson` is used instead of building the subproject.
 
 ## Commands
 
-### `cli-toot login <instance>`
+### `sloptoot login <instance>`
 Performs the full Mastodon OAuth login dance and persists credentials.
 
 Flow (default PKCE + loopback, OOB fallback):
 1. Validate `instance` arg (required). Normalize to `https://<instance>`.
 2. **Bind loopback HTTP server** on `127.0.0.1:0` (ephemeral port) first. `redirect_uri = http://127.0.0.1:<port>/callback`.
    - If bind fails → fall back to OOB: `redirect_uri = urn:ietf:wg:oauth:2.0:oob`.
-3. **Register app** — `POST /api/v1/apps` with `client_name="cli ToooT"`, `redirect_uris` set to the exact bound `redirect_uri` plus `urn:ietf:wg:oauth:2.0:oob` (joined with `\n`; OOB only, on fallback), `scopes="read write"`. Parse `client_id`, `client_secret`. (Binding first lets us register the exact URI Mastodon will match at authorize time.)
+3. **Register app** — `POST /api/v1/apps` with `client_name="slop TooT"`, `redirect_uris` set to the exact bound `redirect_uri` plus `urn:ietf:wg:oauth:2.0:oob` (joined with `\n`; OOB only, on fallback), `scopes="read write"`. Parse `client_id`, `client_secret`. (Binding first lets us register the exact URI Mastodon will match at authorize time.)
 4. **Generate PKCE:**
    - `code_verifier` = base64url(32 random bytes from `/dev/urandom`) → 43 chars.
    - `code_challenge` = base64url(SHA-256(verifier)), `code_challenge_method = S256`.
@@ -57,19 +57,19 @@ Flow (default PKCE + loopback, OOB fallback):
 8. **Verify** — `GET /api/v1/accounts/verify_credentials` with `Authorization: Bearer <token>`. Print `@username@instance`.
 9. **Save** `instance`, `client_id`, `client_secret`, `access_token`, `account_id`, `username` to config (mode 0600). Print success.
 
-### `cli-toot toot "<text>"`
+### `sloptoot toot "<text>"`
 1. `config_load()` — require `instance` + `access_token` (exit 2 if not logged in).
 2. URL-encode status text. `POST /api/v1/statuses` form `status=<enc>&visibility=public` with Bearer header.
 3. Parse `Status` entity; print posted `url` field. On non-2xx, print error + response body.
 
-### `cli-toot toot [flags]`
+### `sloptoot toot [flags]`
 Flags (combined with the text form above):
 - `--reply`, `-r` **without a value** reposts as a reply to your most recently posted status (the chain anchor is kept in the SQLite cache). Requires at least one prior post; otherwise exit 1.
 - `--reply <id-or-url>`, `-r <id-or-url>`, `--reply=<id-or-url>`, `-r<id-or-url>` reply to a specific status. A bare numeric id is used directly; a status URL has its trailing id extracted (`normalize_status_id`). Invalid references exit 1.
 - **Editor fallback:** when no positional `"<text>"` is given, `$EDITOR` (falls back to `VISUAL`, then `vi`) opens on a temp file. If the buffer is left empty/unchanged the post is cancelled (exit 0, "cancelled" printed). Otherwise the written text is posted.
 - After any successful post the new status id is recorded as the next chain anchor.
 
-### `cli-toot ls [profile|timeline|#tag] [-m] [-l]`
+### `sloptoot ls [profile|timeline|#tag] [-m] [-l]`
 Lists posts as plain text lines (`<id>  <relative-time>  <text>` with HTML stripped). The id is the Mastodon status id, so a listed post can be replied to directly with `toot -r <id>` or deleted with `delete <id>`. Relative time is shown as `now`/`5m`/`3h`/`2d`/`4w`. Each line is truncated to the terminal column count (via `TIOCGWINSZ`); pass `-l`/`--long` to print full (wrapped) text instead.
 
 By default `ls` fetches enough posts (paging via `max_id`, `limit=40`) to fill the terminal height minus two rows (via terminal rows from `TIOCGWINSZ`, fallback 24), so the shell prompt isn't pushed off. Only the posts that fit are printed.
@@ -82,38 +82,38 @@ By default `ls` fetches enough posts (paging via `max_id`, `limit=40`) to fill t
 
 All loaded statuses are stored in the SQLite cache keyed by timeline type. The most recently used type is remembered so `--mobile` serves it too.
 
-### `cli-toot delete <id-or-url>`
+### `sloptoot delete <id-or-url>`
 1. `normalize_status_id(ref)` — a bare numeric id is used directly; a status URL has its trailing id extracted.
 2. `DELETE /api/v1/statuses/{id}` with Bearer header (exit 3 on network/non-2xx error, exit 1 on an invalid reference).
 3. On success the id is removed from the SQLite cache (`cache_delete_status`); if it was the last-post chain anchor that anchor is cleared. Prints `deleted <id>`.
 
-### `cli-toot whoami`
+### `sloptoot whoami`
 `GET /api/v1/accounts/verify_credentials`; print `@username@instance`. Cheap token-validation helper.
 
-### `cli-toot version` / `--version` / `-V`
-Print `cli-toot <version>`. The version is configured by Meson from `meson.build` into a generated `src/version.h` (via `src/version.h.in`).
+### `sloptoot version` / `--version` / `-V`
+Print `sloptoot <version>`. The version is configured by Meson from `meson.build` into a generated `src/version.h` (via `src/version.h.in`).
 
-### `cli-toot help` / bare invocation
+### `sloptoot help` / bare invocation
 Print usage.
 
-### `cli-toot view <id-or-url>`
+### `sloptoot view <id-or-url>`
 `GET /api/v1/statuses/{id}` and print a detailed view: author display name and handle, the post text (HTML stripped), posted timestamp with relative time, status id, canonical URL, and `reblogs_count` / `favourites_count` / `replies_count`. Accepts a bare id (Mastodon numeric snowflake or GoToSocial ULID) or a status URL. Exit 1 on an invalid reference, 3 on network/HTTP errors.
 
 **When the id is a boost**, the view shows the boost line first (`🚀 @<booster> boosted`, when it was boosted), then the detailed view of the *underlying* post from its `reblog`.
 
-### `cli-toot boost|like|bookmark <id-or-url>`
+### `sloptoot boost|like|bookmark <id-or-url>`
 Status actions: `boost` (reblog), `like` (favourite), and `bookmark` each `POST /api/v1/statuses/{id}/{action}` (`reblog`, `favourite`, `bookmark`) with the Bearer header and no body. Accepts a bare id (numeric or ULID) or a status URL. **If the id is a boost, the action is applied to the underlying `reblog` post.** Prints the API action on success. Exit 1 on an invalid reference, 2 not logged in, 3 on network/HTTP errors.
 
 The shared resolver `resolve_status_id(ref)` fetches the status and unwraps a boost before actions and replies; a reply to a boost (`toot --reply <boost-id>`) also targets the underlying post.
 
 ## Config storage
-- Path: `$XDG_CONFIG_HOME/cli-toot/config` or `$HOME/.config/cli-toot/config`.
+- Path: `$XDG_CONFIG_HOME/sloptoot/config` or `$HOME/.config/sloptoot/config`.
 - Format: flat `key=value`, one per line.
 - Fields: `instance`, `client_id`, `client_secret`, `access_token`, `account_id`, `username`.
 - Created with mode 0600 (`open(O_CREAT, 0600)` + `fchmod`).
 
 ## SQLite cache
-- Path: `$XDG_CONFIG_HOME/cli-toot/cache.db` or `$HOME/.config/cli-toot/cache.db`.
+- Path: `$XDG_CONFIG_HOME/sloptoot/cache.db` or `$HOME/.config/sloptoot/cache.db`.
 - Tables:
   - `statuses(id, created_at, account, content, reblog_of)` — deduplicated statuses; a boost wrapper row carries the boosted inner id in `reblog_of` and the booster's handle in `account`. The inner boosted post is stored for lookup but is not itself a timeline entry.
   - `timeline_statuses(type, id)` — which timeline type surfaced each status.
@@ -128,7 +128,7 @@ The shared resolver `resolve_status_id(ref)` fetches the status and unwraps a bo
 
 ## Project layout
 ```
-cli-toot/
+sloptoot/
 ├── meson.build
 ├── subprojects/cjson.wrap
 ├── src/
@@ -165,7 +165,7 @@ cli-toot/
 - Linux: install `meson`, `pkg-config`, `libcurl4-openssl-dev` (or distro equivalent), `libssl-dev` (provides `libcrypto`), `libsqlite3-dev`.
 
 ## Meson build essentials
-- `project('cli-toot','c',version:'<version>',default_options:['c_std=c23','warning_level=2','werror=true'])`.
+- `project('sloptoot','c',version:'<version>',default_options:['c_std=c23','warning_level=2','werror=true'])`.
 - `dependency('libcurl')` via pkg-config.
 - `dependency('libcjson', fallback : ['cjson', 'libcjson_dep'])` — uses system cjson if available, else builds the subproject.
 - `dependency('sqlite3')` via pkg-config (Homebrew keg `sqlite` provides a `.pc`).
@@ -173,19 +173,19 @@ cli-toot/
 - `_GNU_SOURCE` added to `c_args` on non-darwin for POSIX function visibility.
 - Linux only: `dependency('libcrypto')`.
 - Per-platform source selection: `sha256_apple.c` on `'darwin'`, else `sha256_posix.c`.
-- `executable('cli-toot', ..., install : true)` — `meson install` places the binary in the prefix `bin/`.
+- `executable('sloptoot', ..., install : true)` — `meson install` places the binary in the prefix `bin/`.
 - Tests: `crypto_test`, `config_test`, `loopback_test`, `cache_test` (run via `meson test`).
 
 ## Verification
 - `meson setup build && meson compile -C build` clean under `-Werror c_std=c23`.
 - `meson test -C build` — all tests pass (crypto NIST vector + verifier length, config round-trip + 0600 mode, loopback end-to-end, cache store/list + chain anchor).
-- `./build/cli-toot version` prints `cli-toot <version>`.
-- `./build/cli-toot login <instance>` → browser opens, token stored, `whoami` works. Tested with Mastodon and GoToSocial.
-- `./build/cli-toot toot "hello"` → post visible.
-- `./build/cli-toot toot --reply` chains to the last post (after posting one); `--reply <id|url>` replies to a specific post.
-- `./build/cli-toot toot` with `EDITOR` set → editor opens, text posts; untouched buffer cancels with exit 0.
-- `./build/cli-toot ls`, `ls timeline`, `ls #tag` fetch and print (`-l`/`--long` wraps instead of truncating to the terminal width); `ls --mobile` serves cached rows without network.
-- `./build/cli-toot delete <id-or-url>` removes a post from the server and cache.
+- `./build/sloptoot version` prints `sloptoot <version>`.
+- `./build/sloptoot login <instance>` → browser opens, token stored, `whoami` works. Tested with Mastodon and GoToSocial.
+- `./build/sloptoot toot "hello"` → post visible.
+- `./build/sloptoot toot --reply` chains to the last post (after posting one); `--reply <id|url>` replies to a specific post.
+- `./build/sloptoot toot` with `EDITOR` set → editor opens, text posts; untouched buffer cancels with exit 0.
+- `./build/sloptoot ls`, `ls timeline`, `ls #tag` fetch and print (`-l`/`--long` wraps instead of truncating to the terminal width); `ls --mobile` serves cached rows without network.
+- `./build/sloptoot delete <id-or-url>` removes a post from the server and cache.
 - Force OOB fallback (loopback bind failure); confirm paste flow works.
 - Smoke test on Linux: `xdg-open`, `/dev/urandom`, libcrypto link, `_GNU_SOURCE` visibility.
-- Homebrew formula: `brew install jiqiren/tap/cli-toot` builds and installs; `brew test` and `brew audit --new --formula` pass.
+- Homebrew formula: `brew install jiqiren/tap/sloptoot` builds and installs; `brew test` and `brew audit --new --formula` pass.

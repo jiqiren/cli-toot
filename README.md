@@ -1,52 +1,52 @@
-# cli-toot
+# sloptoot
 
 A minimal command-line Mastodon client for sending quick toots, written in pure C23. Targets macOS and Linux.
 
 ## Install
 
 ```sh
-brew install jiqiren/tap/cli-toot
+brew install jiqiren/tap/sloptoot
 ```
 
-Then run `cli-toot login <instance>` to get started.
+Then run `sloptoot login <instance>` to get started.
 
 ## What it does
 
-- `cli-toot login <instance>` — run the Mastodon OAuth login dance and store a Bearer token.
-- `cli-toot toot "<text>"` — post a new public status.
-- `cli-toot toot` — compose in `$EDITOR` (leaving the buffer empty cancels the post).
-- `cli-toot toot --reply` — reply to your most recent post (thread chaining).
-- `cli-toot toot --reply <id-or-url>` — reply to a specific status.
-- `cli-toot ls [profile|timeline|#tag]` — list your posts, your home timeline, or hashtag posts. Default output truncates to your terminal width; `-l`/`--long` prints full (wrapped) text.
-- `cli-toot ls --mobile` — serve the last listing from the local cache instead of hitting the network.
-- `cli-toot delete <id-or-url>` — remove one of your posts (server and local cache).
-- `cli-toot view <id-or-url>` — show a detailed view of a post (author, text, date, boost/like/reply counts).
-- `cli-toot boost <id-or-url>` — boost (reblog) a post.
-- `cli-toot like <id-or-url>` — favourite a post.
-- `cli-toot bookmark <id-or-url>` — bookmark a post.
-- `cli-toot whoami` — show the logged-in account handle.
-- `cli-toot version` — show version (`--version` / `-V` also work).
-- `cli-toot help` — print usage.
+- `sloptoot login <instance>` — run the Mastodon OAuth login dance and store a Bearer token.
+- `sloptoot toot "<text>"` — post a new public status.
+- `sloptoot toot` — compose in `$EDITOR` (leaving the buffer empty cancels the post).
+- `sloptoot toot --reply` — reply to your most recent post (thread chaining).
+- `sloptoot toot --reply <id-or-url>` — reply to a specific status.
+- `sloptoot ls [profile|timeline|#tag]` — list your posts, your home timeline, or hashtag posts. Default output truncates to your terminal width; `-l`/`--long` prints full (wrapped) text.
+- `sloptoot ls --mobile` — serve the last listing from the local cache instead of hitting the network.
+- `sloptoot delete <id-or-url>` — remove one of your posts (server and local cache).
+- `sloptoot view <id-or-url>` — show a detailed view of a post (author, text, date, boost/like/reply counts).
+- `sloptoot boost <id-or-url>` — boost (reblog) a post.
+- `sloptoot like <id-or-url>` — favourite a post.
+- `sloptoot bookmark <id-or-url>` — bookmark a post.
+- `sloptoot whoami` — show the logged-in account handle.
+- `sloptoot version` — show version (`--version` / `-V` also work).
+- `sloptoot help` — print usage.
 
-The app registers itself with Mastodon as `cli ToooT` (exact spelling intentional).
+The app registers itself with Mastodon as `slop TooT` (exact spelling intentional).
 
 ## Quick start
 
 ```sh
-brew install jiqiren/tap/cli-toot
-cli-toot login fosstodon.org
+brew install jiqiren/tap/sloptoot
+sloptoot login fosstodon.org
 # browser opens → authorize → "Logged in as @you@fosstodon.org"
 
-cli-toot toot "hello from cli-toot"
+sloptoot toot "hello from sloptoot"
 # https://fosstodon.org/@you/...
 
-cli-toot ls
-# 20268888408374051  2h  hello from cli-toot
+sloptoot ls
+# 20268888408374051  2h  hello from sloptoot
 # 50  3m  🚀 @bob
 #   ⎣  [10] 2h  original art post that got boosted
 # (id, relative time, then body; HTML stripped; boosts shown specially)
 
-cli-toot toot "a follow-up reply" --reply 20268888408374051
+sloptoot toot "a follow-up reply" --reply 20268888408374051
 # posts a reply to that specific post
 ```
 
@@ -61,11 +61,11 @@ Works with both Mastodon and GoToSocial instances.
 3. Generates a PKCE `code_verifier` (32 bytes from `/dev/urandom`, base64url-encoded) and `code_challenge = base64url(SHA-256(verifier))`.
 4. Opens your browser to the instance's `/oauth/authorize` endpoint with the challenge and a random `state`.
 5. Waits for the instance to redirect back with `?code=...&state=...`, validates `state`, exchanges the code for an access token, and verifies via `/api/v1/accounts/verify_credentials`.
-6. Saves credentials to `~/.config/cli-toot/config` (mode 0600).
+6. Saves credentials to `~/.config/sloptoot/config` (mode 0600).
 
 If the loopback server can't bind, it falls back to the OOB flow: the instance displays a code on a page and you paste it into the CLI.
 
-Set `CLI_TOOT_DEBUG=1` to have the loopback server print the raw callback request to stderr — useful for diagnosing OAuth errors.
+Set `SLOPTOOT_DEBUG=1` to have the loopback server print the raw callback request to stderr — useful for diagnosing OAuth errors.
 
 ## Build from source
 
@@ -89,11 +89,11 @@ The build uses `c_std=c23`, `warning_level=2`, and `werror=true` — it must com
 
 ### Config
 
-Credentials live at `$XDG_CONFIG_HOME/cli-toot/config` (or `~/.config/cli-toot/config` if `XDG_CONFIG_HOME` is unset), written with mode `0600`. The file is a flat `key=value` list of `instance`, `client_id`, `client_secret`, `access_token`, `account_id`, `username`.
+Credentials live at `$XDG_CONFIG_HOME/sloptoot/config` (or `~/.config/sloptoot/config` if `XDG_CONFIG_HOME` is unset), written with mode `0600`. The file is a flat `key=value` list of `instance`, `client_id`, `client_secret`, `access_token`, `account_id`, `username`.
 
 ### Cache
 
-Fetched listings live in a SQLite database at `$XDG_CONFIG_HOME/cli-toot/cache.db` (or `~/.config/cli-toot/cache.db`). It holds post metadata only (never credentials) and remembers your last post so `toot --reply` can chain threads.
+Fetched listings live in a SQLite database at `$XDG_CONFIG_HOME/sloptoot/cache.db` (or `~/.config/sloptoot/cache.db`). It holds post metadata only (never credentials) and remembers your last post so `toot --reply` can chain threads.
 
 ## Exit codes
 
@@ -105,7 +105,7 @@ Fetched listings live in a SQLite database at `$XDG_CONFIG_HOME/cli-toot/cache.d
 ## Project layout
 
 ```
-cli-toot/
+sloptoot/
 ├── meson.build
 ├── subprojects/cjson.wrap
 ├── src/

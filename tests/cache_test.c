@@ -12,7 +12,7 @@
 /* The cache honours XDG_CONFIG_HOME; point it at a scratch dir so the test
  * never touches real credentials. */
 static int run(void) {
-  char dir[] = "/tmp/cli-toot-cache-test-XXXXXX";
+  char dir[] = "/tmp/sloptoot-cache-test-XXXXXX";
   if (mkdtemp(dir) == nullptr) return 1;
   if (setenv("XDG_CONFIG_HOME", dir, 1) != 0) return 1;
 
@@ -120,7 +120,7 @@ static int run(void) {
 
 /* Delete removes a cached status and clears the chain anchor when it matches. */
 static int run_delete(void) {
-  char dir[] = "/tmp/cli-toot-cache-del-XXXXXX";
+  char dir[] = "/tmp/sloptoot-cache-del-XXXXXX";
   if (mkdtemp(dir) == nullptr) return 1;
   if (setenv("XDG_CONFIG_HOME", dir, 1) != 0) return 1;
 

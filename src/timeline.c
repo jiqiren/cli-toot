@@ -77,7 +77,7 @@ int ls_statuses(const config *c, cache *db, const char *type, bool mobile,
                 bool wrap) {
   if (c == nullptr || c->instance == nullptr || c->access_token == nullptr) {
     fprintf(stderr,
-            "error: not logged in. Run `cli-toot login <instance>`.\n");
+            "error: not logged in. Run `sloptoot login <instance>`.\n");
     return 2;
   }
 

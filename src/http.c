@@ -125,7 +125,7 @@ bool http_post_form(const char *url, const http_field *fields, size_t nfields,
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, hdrs);
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_cb);
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, resp);
-  curl_easy_setopt(curl, CURLOPT_USERAGENT, "cli-toot/0.1.0");
+  curl_easy_setopt(curl, CURLOPT_USERAGENT, "sloptoot/0.1.0");
   curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
   bool ok = perform(curl, resp);
@@ -155,7 +155,7 @@ bool http_post_json(const char *url, const char *body, const char *bearer,
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, hdrs);
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_cb);
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, resp);
-  curl_easy_setopt(curl, CURLOPT_USERAGENT, "cli-toot/0.1.0");
+  curl_easy_setopt(curl, CURLOPT_USERAGENT, "sloptoot/0.1.0");
 
   bool ok = perform(curl, resp);
 
@@ -179,7 +179,7 @@ bool http_get(const char *url, const char *bearer, http_response *resp) {
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, hdrs);
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_cb);
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, resp);
-  curl_easy_setopt(curl, CURLOPT_USERAGENT, "cli-toot/0.1.0");
+  curl_easy_setopt(curl, CURLOPT_USERAGENT, "sloptoot/0.1.0");
   curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
   bool ok = perform(curl, resp);
@@ -205,7 +205,7 @@ bool http_delete(const char *url, const char *bearer, http_response *resp) {
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, hdrs);
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_cb);
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, resp);
-  curl_easy_setopt(curl, CURLOPT_USERAGENT, "cli-toot/0.1.0");
+  curl_easy_setopt(curl, CURLOPT_USERAGENT, "sloptoot/0.1.0");
   curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
   bool ok = perform(curl, resp);
@@ -232,7 +232,7 @@ bool http_post_empty(const char *url, const char *bearer, http_response *resp) {
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, hdrs);
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_cb);
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, resp);
-  curl_easy_setopt(curl, CURLOPT_USERAGENT, "cli-toot/0.1.0");
+  curl_easy_setopt(curl, CURLOPT_USERAGENT, "sloptoot/0.1.0");
   curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
   bool ok = perform(curl, resp);

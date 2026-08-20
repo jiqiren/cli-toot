@@ -33,16 +33,16 @@ static char *cache_path(void) {
   const char *xdg = getenv("XDG_CONFIG_HOME");
   const char *home;
   if (xdg != nullptr && xdg[0] != '\0') {
-    size_t n = strlen(xdg) + strlen("/cli-toot/cache.db") + 1;
+    size_t n = strlen(xdg) + strlen("/sloptoot/cache.db") + 1;
     char *p = malloc(n);
-    if (p != nullptr) snprintf(p, n, "%s/cli-toot/cache.db", xdg);
+    if (p != nullptr) snprintf(p, n, "%s/sloptoot/cache.db", xdg);
     return p;
   }
   home = getenv("HOME");
   if (home == nullptr || home[0] == '\0') return nullptr;
-  size_t n = strlen(home) + strlen("/.config/cli-toot/cache.db") + 1;
+  size_t n = strlen(home) + strlen("/.config/sloptoot/cache.db") + 1;
   char *p = malloc(n);
-  if (p != nullptr) snprintf(p, n, "%s/.config/cli-toot/cache.db", home);
+  if (p != nullptr) snprintf(p, n, "%s/.config/sloptoot/cache.db", home);
   return p;
 }
 

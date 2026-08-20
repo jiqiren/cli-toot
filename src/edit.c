@@ -70,7 +70,7 @@ int edit_open(editor_result *out) {
   size_t n = strlen(tmp) + 32;
   char *path = malloc(n);
   if (path == nullptr) return -1;
-  snprintf(path, n, "%s/cli-toot-XXXXXX", tmp);
+  snprintf(path, n, "%s/sloptoot-XXXXXX", tmp);
 
   int fd = mkstemp(path);
   if (fd < 0) {
