@@ -11,6 +11,7 @@ cli-toot: a minimal C23 CLI Mastodon client. See `Spec.md` for the full specific
 ## Dependencies
 - **libcurl**: hard system dependency, linked via pkg-config. Always use it for HTTP — do not hand-roll sockets for API calls.
 - **cJSON**: via Meson subproject wrap (`subprojects/cjson.wrap`). **Do not vendor** cJSON source. Access via `dependency('libcjson', fallback : ['cjson', 'libcjson_dep'])` — this prefers a system-installed cjson (pkg-config) and falls back to the subproject only when not found. Pass `--wrap-mode=nofallback` to force system cjson (used by the Homebrew formula).
+- **SQLite**: used for the status cache (`src/cache.c`). Link `dependency('sqlite3')` via pkg-config — the Homebrew `sqlite` keg ships `sqlite3.pc`; Linux distros ship `libsqlite3-dev`. Never store `access_token`/`client_secret` in the DB.
 - **SHA-256**: per-platform shim only.
   - macOS: CommonCrypto (`CC_SHA256`).
   - Linux: libcrypto (`SHA256()`, `dependency('libcrypto')`).
@@ -68,7 +69,7 @@ To run tests: `meson test -C build`.
 - When releasing a new version: bump `meson.build` version, commit, tag `v<version>`, push the tag, create a GitHub release, compute the tarball SHA-256, and update the formula's `url`/`sha256`/`version` in the tap.
 
 ## Things to NOT do
-- Do not add streaming/timeline/notification features — out of scope for v1.
+- Do not add streaming/notification features or media uploads — out of scope.
 - Do not introduce a second TLS library.
 - Do not vendor JSON or crypto libs.
 - Do not leave commented-out code or noise in source files.

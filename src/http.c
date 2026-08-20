@@ -188,3 +188,56 @@ bool http_get(const char *url, const char *bearer, http_response *resp) {
   curl_easy_cleanup(curl);
   return ok;
 }
+
+bool http_delete(const char *url, const char *bearer, http_response *resp) {
+  CURL *curl = curl_easy_init();
+  if (curl == nullptr) return false;
+
+  struct curl_slist *hdrs = nullptr;
+  if (bearer != nullptr) {
+    char auth[512];
+    snprintf(auth, sizeof(auth), "Authorization: Bearer %s", bearer);
+    hdrs = curl_slist_append(hdrs, auth);
+  }
+
+  curl_easy_setopt(curl, CURLOPT_URL, url);
+  curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, hdrs);
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_cb);
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, resp);
+  curl_easy_setopt(curl, CURLOPT_USERAGENT, "cli-toot/0.1.0");
+  curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+
+  bool ok = perform(curl, resp);
+
+  curl_slist_free_all(hdrs);
+  curl_easy_cleanup(curl);
+  return ok;
+}
+
+bool http_post_empty(const char *url, const char *bearer, http_response *resp) {
+  CURL *curl = curl_easy_init();
+  if (curl == nullptr) return false;
+
+  struct curl_slist *hdrs = nullptr;
+  if (bearer != nullptr) {
+    char auth[512];
+    snprintf(auth, sizeof(auth), "Authorization: Bearer %s", bearer);
+    hdrs = curl_slist_append(hdrs, auth);
+  }
+
+  curl_easy_setopt(curl, CURLOPT_URL, url);
+  curl_easy_setopt(curl, CURLOPT_POST, 1L);
+  curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
+  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, hdrs);
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_cb);
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, resp);
+  curl_easy_setopt(curl, CURLOPT_USERAGENT, "cli-toot/0.1.0");
+  curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+
+  bool ok = perform(curl, resp);
+
+  curl_slist_free_all(hdrs);
+  curl_easy_cleanup(curl);
+  return ok;
+}

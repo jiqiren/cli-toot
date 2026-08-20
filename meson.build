@@ -1,5 +1,5 @@
 project('cli-toot', 'c',
-  version : '1.1.1',
+  version : '1.2.0',
   default_options : [
     'c_std=c23',
     'warning_level=2',
@@ -10,6 +10,8 @@ project('cli-toot', 'c',
 curl_dep = dependency('libcurl', required : true)
 
 cjson_dep = dependency('libcjson', fallback : ['cjson', 'libcjson_dep'])
+
+sqlite_dep = dependency('sqlite3', required : true)
 
 common_args = []
 if host_machine.system() != 'darwin'
@@ -24,7 +26,7 @@ version_h = configure_file(
   configuration : conf_data,
 )
 
-deps = [curl_dep, cjson_dep]
+deps = [curl_dep, cjson_dep, sqlite_dep]
 src = files(
   'src/main.c',
   'src/base64.c',
@@ -35,6 +37,10 @@ src = files(
   'src/loopback.c',
   'src/oauth.c',
   'src/toot.c',
+  'src/cache.c',
+  'src/timeline.c',
+  'src/edit.c',
+  'src/view.c',
 )
 
 if host_machine.system() == 'darwin'
@@ -70,5 +76,13 @@ test('config', executable('config_test', 'tests/config_test.c',
 test('loopback', executable('loopback_test', 'tests/loopback_test.c',
   'src/loopback.c',
   include_directories : 'src',
+  c_args : common_args,
+))
+
+test('cache', executable('cache_test', 'tests/cache_test.c',
+  'src/cache.c',
+  'src/json_helpers.c',
+  include_directories : 'src',
+  dependencies : [cjson_dep, sqlite_dep],
   c_args : common_args,
 ))

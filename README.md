@@ -14,6 +14,16 @@ Then run `cli-toot login <instance>` to get started.
 
 - `cli-toot login <instance>` — run the Mastodon OAuth login dance and store a Bearer token.
 - `cli-toot toot "<text>"` — post a new public status.
+- `cli-toot toot` — compose in `$EDITOR` (leaving the buffer empty cancels the post).
+- `cli-toot toot --reply` — reply to your most recent post (thread chaining).
+- `cli-toot toot --reply <id-or-url>` — reply to a specific status.
+- `cli-toot ls [profile|timeline|#tag]` — list your posts, your home timeline, or hashtag posts. Default output truncates to your terminal width; `-l`/`--long` prints full (wrapped) text.
+- `cli-toot ls --mobile` — serve the last listing from the local cache instead of hitting the network.
+- `cli-toot delete <id-or-url>` — remove one of your posts (server and local cache).
+- `cli-toot view <id-or-url>` — show a detailed view of a post (author, text, date, boost/like/reply counts).
+- `cli-toot boost <id-or-url>` — boost (reblog) a post.
+- `cli-toot like <id-or-url>` — favourite a post.
+- `cli-toot bookmark <id-or-url>` — bookmark a post.
 - `cli-toot whoami` — show the logged-in account handle.
 - `cli-toot version` — show version (`--version` / `-V` also work).
 - `cli-toot help` — print usage.
@@ -29,6 +39,15 @@ cli-toot login fosstodon.org
 
 cli-toot toot "hello from cli-toot"
 # https://fosstodon.org/@you/...
+
+cli-toot ls
+# 20268888408374051  2h  hello from cli-toot
+# 50  3m  🚀 @bob
+#   ⎣  [10] 2h  original art post that got boosted
+# (id, relative time, then body; HTML stripped; boosts shown specially)
+
+cli-toot toot "a follow-up reply" --reply 20268888408374051
+# posts a reply to that specific post
 ```
 
 Works with both Mastodon and GoToSocial instances.
@@ -50,19 +69,19 @@ Set `CLI_TOOT_DEBUG=1` to have the loopback server print the raw callback reques
 
 ## Build from source
 
-Requires Meson, pkg-config, libcurl, and (on Linux) libcrypto/openssl dev headers. cJSON is fetched automatically via a Meson subproject wrap (or use a system-installed `cjson`).
+Requires Meson, pkg-config, libcurl, SQLite (`sqlite3`), and (on Linux) libcrypto/openssl dev headers. cJSON is fetched automatically via a Meson subproject wrap (or use a system-installed `cjson`).
 
 ### macOS (Homebrew)
 
 ```sh
-brew install meson pkg-config curl
+brew install meson pkg-config curl sqlite
 meson setup build && meson compile -C build
 ```
 
 ### Linux (Debian/Ubuntu)
 
 ```sh
-sudo apt install meson pkg-config libcurl4-openssl-dev libssl-dev
+sudo apt install meson pkg-config libcurl4-openssl-dev libssl-dev libsqlite3-dev
 meson setup build && meson compile -C build
 ```
 
@@ -71,6 +90,10 @@ The build uses `c_std=c23`, `warning_level=2`, and `werror=true` — it must com
 ### Config
 
 Credentials live at `$XDG_CONFIG_HOME/cli-toot/config` (or `~/.config/cli-toot/config` if `XDG_CONFIG_HOME` is unset), written with mode `0600`. The file is a flat `key=value` list of `instance`, `client_id`, `client_secret`, `access_token`, `account_id`, `username`.
+
+### Cache
+
+Fetched listings live in a SQLite database at `$XDG_CONFIG_HOME/cli-toot/cache.db` (or `~/.config/cli-toot/cache.db`). It holds post metadata only (never credentials) and remembers your last post so `toot --reply` can chain threads.
 
 ## Exit codes
 
@@ -89,7 +112,11 @@ cli-toot/
 │   ├── main.c            CLI dispatch
 │   ├── version.h.in      version template (Meson generates version.h)
 │   ├── oauth.{c,h}       app registration, PKCE, token exchange, login
-│   ├── toot.{c,h}        post a status
+│   ├── toot.{c,h}        post a status, replies, delete, chain anchor
+│   ├── timeline.{c,h}    ls command (profile / home / hashtag)
+│   ├── cache.{c,h}       SQLite status cache
+│   ├── edit.{c,h}        $EDITOR compose flow
+│   ├── view.{c,h}        view command (detailed single-status view)
 │   ├── http.{c,h}        libcurl helpers (form/json/get, urlencode)
 │   ├── loopback.{c,h}    127.0.0.1 callback server
 │   ├── config.{c,h}      XDG config load/save (0600)
@@ -100,7 +127,8 @@ cli-toot/
 ├── tests/
 │   ├── crypto_test.c
 │   ├── config_test.c
-│   └── loopback_test.c
+│   ├── loopback_test.c
+│   └── cache_test.c
 ├── Spec.md
 ├── AGENTS.md
 ├── README.md
@@ -117,5 +145,6 @@ meson test -C build
 
 - [libcurl](https://curl.se/) — HTTP/TLS, via pkg-config.
 - [cJSON](https://github.com/DaveGamble/cJSON) — JSON, via Meson wrap (auto-fetched) or system `cjson` formula.
+- [SQLite](https://www.sqlite.org/) — status cache, via `dependency('sqlite3')` (Homebrew `sqlite` keg on macOS).
 - SHA-256: CommonCrypto on macOS, libcrypto (`SHA256()`) on Linux. No vendored crypto.
 - Random bytes: `/dev/urandom`.

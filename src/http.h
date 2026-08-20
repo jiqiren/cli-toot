@@ -27,6 +27,13 @@ void http_global_cleanup(void);
 [[nodiscard]] bool http_get(const char *url, const char *bearer,
                             http_response *resp);
 
+[[nodiscard]] bool http_delete(const char *url, const char *bearer,
+                               http_response *resp);
+
+/* POST with no request body (used for status actions like reblog/favourite). */
+[[nodiscard]] bool http_post_empty(const char *url, const char *bearer,
+                                   http_response *resp);
+
 void http_response_free(http_response *resp);
 
 [[nodiscard]] char *urlencode(const char *s);
