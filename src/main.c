@@ -77,12 +77,20 @@ static bool open_cache(cache *db) {
 
 static bool looks_like_status_ref(const char *s) {
   if (s == nullptr || s[0] == '\0') return false;
-  /* A bare numeric Mastodon status id, or an HTTP(S) status URL. */
+  /* An HTTP(S) status URL. */
   if (strncmp(s, "http", 4) == 0) return true;
+  /* A bare numeric legacy Mastodon snowflake id. */
+  bool numeric = true, upper_alnum = true;
+  size_t len = 0;
   for (const char *p = s; *p != '\0'; p++) {
-    if (!isdigit((unsigned char)*p)) return false;
+    len++;
+    if (!isdigit((unsigned char)*p)) numeric = false;
+    if (!((*p >= '0' && *p <= '9') || (*p >= 'A' && *p <= 'Z'))) upper_alnum = false;
   }
-  return true;
+  if (numeric) return true;
+  /* A new-format Mastodon id or GoToSocial ULID: 26 uppercase base32-ish
+   * characters (the new-format ids start with '0'). */
+  return len == 26 && upper_alnum;
 }
 
 static int cmd_toot(int argc, char **argv) {
