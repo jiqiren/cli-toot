@@ -105,9 +105,36 @@ int view_status(const char *ref) {
   printf("ID:     %s\n", json_get_string(detail, "id"));
   const char *post_url = json_get_string(detail, "url");
   if (post_url != nullptr) printf("URL:    %s\n", post_url);
+
+  const char *visibility = json_get_string(detail, "visibility");
+  printf("Visibility: %s\n", visibility != nullptr ? visibility : "?");
+
+  /* Posting client (client name the instance registered for the app). */
+  const cJSON *app = cJSON_GetObjectItemCaseSensitive(detail, "application");
+  const char *client = app != nullptr ? json_get_string(app, "name") : nullptr;
+  printf("Client:   %s\n", client != nullptr && client[0] != '\0' ? client : "-");
+
   printf("Boosts: %d\n", json_get_int(detail, "reblogs_count"));
   printf("Likes:  %d\n", json_get_int(detail, "favourites_count"));
   printf("Replies:%d\n", json_get_int(detail, "replies_count"));
+
+  /* Attachments: we cannot render media in the terminal, so show the count
+   * and each attachment's alt text (description) when one is set. */
+  const cJSON *media =
+      cJSON_GetObjectItemCaseSensitive(detail, "media_attachments");
+  int nmedia = (media != nullptr && cJSON_IsArray(media)) ? cJSON_GetArraySize(media) : 0;
+  if (nmedia > 0) {
+    printf("Attachments: %d\n", nmedia);
+    for (int i = 0; i < nmedia; i++) {
+      const cJSON *att = cJSON_GetArrayItem(media, i);
+      const char *desc = att != nullptr ? json_get_string(att, "description") : nullptr;
+      if (desc != nullptr && desc[0] != '\0') {
+        char alt[1024];
+        cache_plain_text(desc, alt, sizeof(alt));
+        printf("  [%d] %s\n", i + 1, alt);
+      }
+    }
+  }
 
   json_free(root);
   return 0;
