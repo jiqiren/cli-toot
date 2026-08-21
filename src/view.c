@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int view_status(const char *ref) {
+int view_status(const char *ref, bool mobile) {
   char *id = normalize_status_id(ref);
   if (id == nullptr) {
     fprintf(stderr, "error: invalid status reference: %s\n",
@@ -18,11 +18,25 @@ int view_status(const char *ref) {
     return 1;
   }
 
+  /* A failing cache is not fatal: we simply skip the offline view and the
+   * cache store. */
+  cache db;
+  bool have_db = cache_open(&db);
+  if (!have_db) db = (cache){0};
+
+  /* Mobile: already cached? Serve from the cache, no network. */
+  if (mobile && have_db && cache_view(&db, id)) {
+    cache_close(&db);
+    free(id);
+    return 0;
+  }
+
   config c;
   config_init(&c);
   if (!config_load(&c) || c.access_token == nullptr || c.instance == nullptr) {
     fprintf(stderr, "error: not logged in. Run `sloptoot login <instance>`.\n");
     config_free(&c);
+    cache_close(&db);
     free(id);
     return 2;
   }
@@ -31,25 +45,30 @@ int view_status(const char *ref) {
   char *url = malloc(n);
   if (url == nullptr) {
     config_free(&c);
+    cache_close(&db);
     free(id);
     return 3;
   }
   snprintf(url, n, "%s/api/v1/statuses/%s", c.instance, id);
-  free(id);
 
   http_response resp = {0};
   bool ok = http_get(url, c.access_token, &resp);
   free(url);
-  config_free(&c);
   if (!ok) {
     fprintf(stderr, "error: network request failed\n");
     http_response_free(&resp);
+    config_free(&c);
+    cache_close(&db);
+    free(id);
     return 3;
   }
   if (resp.code < 200 || resp.code >= 300) {
     fprintf(stderr, "error: HTTP %ld\n", resp.code);
     if (resp.body != nullptr) fprintf(stderr, "%s\n", resp.body);
     http_response_free(&resp);
+    config_free(&c);
+    cache_close(&db);
+    free(id);
     return 3;
   }
 
@@ -57,8 +76,15 @@ int view_status(const char *ref) {
   http_response_free(&resp);
   if (root == nullptr) {
     fprintf(stderr, "error: could not parse response\n");
+    config_free(&c);
+    cache_close(&db);
+    free(id);
     return 3;
   }
+
+  /* Cache it (a boost wrapper stores its inner post too) so that later
+   * `view --mobile` can serve it without network. */
+  if (have_db) cache_store_status(&db, root);
 
   /* A boost wrapper's real content is on the inner `reblog` status. */
   const cJSON *inner = cJSON_GetObjectItemCaseSensitive(root, "reblog");
@@ -137,5 +163,8 @@ int view_status(const char *ref) {
   }
 
   json_free(root);
+  config_free(&c);
+  cache_close(&db);
+  free(id);
   return 0;
 }

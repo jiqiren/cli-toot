@@ -173,6 +173,21 @@ void cache_store_statuses(cache *c, const cJSON *timeline, const char *type) {
   }
 }
 
+/* Store a single status object — a boost wrapper plus its inner post —
+ * without tying either to a timeline (used after fetching one status). */
+void cache_store_status(cache *c, const cJSON *status) {
+  if (c == nullptr || c->db == nullptr || status == nullptr) return;
+  const cJSON *reblog = cJSON_GetObjectItemCaseSensitive(status, "reblog");
+  if (reblog != nullptr && cJSON_IsObject(reblog)) {
+    store_status_row(c, reblog, nullptr);
+    const char *inner_id = status_field(reblog, "id");
+    if (inner_id[0] == '\0') inner_id = nullptr;
+    store_status_row(c, status, inner_id);
+  } else {
+    store_status_row(c, status, nullptr);
+  }
+}
+
 /* Strip HTML tags and unescape common entities for plain-text display. */
 static void plain_text(const char *src, char *out, size_t cap) {  size_t j = 0;
   bool in_tag = false;
@@ -493,6 +508,88 @@ void cache_list_items(const cache *c, const cJSON *arr, bool wrap) {
       print_row(id, created, content, wrap);
     }
   }
+}
+
+/* One cached status, with its stored fields copied out of the database into
+ * fixed-size buffers (sqlite column pointers only live until finalize). */
+typedef struct {
+  char created[64];
+  char account[256];
+  char reblog_of[128];
+  char text[8192]; /* content, already converted to plain text */
+} cached_status;
+
+/* Copy the stored row for `id` into `row`. Returns false if not present. */
+static bool cached_row(const cache *c, const char *id, cached_status *row) {
+  memset(row, 0, sizeof(*row));
+  sqlite3_stmt *st = nullptr;
+  const char *q = "SELECT created_at, account, content, reblog_of"
+                  " FROM statuses WHERE id=?1;";
+  if (sqlite3_prepare_v2(c->db, q, -1, &st, nullptr) != SQLITE_OK)
+    return false;
+  sqlite3_bind_text(st, 1, id, -1, SQLITE_TRANSIENT);
+  bool found = false;
+  if (sqlite3_step(st) == SQLITE_ROW) {
+    snprintf(row->created, sizeof(row->created), "%s",
+             (const char *)sqlite3_column_text(st, 0) != nullptr
+                 ? (const char *)sqlite3_column_text(st, 0)
+                 : "");
+    snprintf(row->account, sizeof(row->account), "%s",
+             (const char *)sqlite3_column_text(st, 1) != nullptr
+                 ? (const char *)sqlite3_column_text(st, 1)
+                 : "");
+    const char *content = (const char *)sqlite3_column_text(st, 2);
+    snprintf(row->reblog_of, sizeof(row->reblog_of), "%s",
+             (const char *)sqlite3_column_text(st, 3) != nullptr
+                 ? (const char *)sqlite3_column_text(st, 3)
+                 : "");
+    plain_text(content != nullptr ? content : "", row->text, sizeof(row->text));
+    found = true;
+  }
+  sqlite3_finalize(st);
+  return found;
+}
+
+/* Detailed single-status view from the cache (mobile mode): the boost line
+ * first for boost wrappers, then handle, full text, posted time and id. The
+ * online-only fields (URL, visibility, client, counts, attachments) are not
+ * stored, so a cached view omits them. */
+bool cache_view(const cache *c, const char *id) {
+  if (c == nullptr || c->db == nullptr || id == nullptr) return false;
+  cached_status row;
+  if (!cached_row(c, id, &row)) return false;
+
+  char rel[16] = "";
+  relative_time(parse_iso8601(row.created), rel, sizeof(rel));
+
+  if (row.reblog_of[0] != '\0') {
+    /* Boost wrapper: booster line, then the underlying post. */
+    printf("\xF0\x9F\x9A\x80 @%s boosted\n", row.account);
+    if (row.created[0] != '\0')
+      printf("Boosted: %s (%s)\n", row.created, rel);
+    printf("\n");
+    cached_status inner;
+    if (!cached_row(c, row.reblog_of, &inner)) {
+      printf("(the boosted post isn't in the cache)\n");
+      return true;
+    }
+    char irel[16] = "";
+    relative_time(parse_iso8601(inner.created), irel, sizeof(irel));
+    printf("@%s\n", inner.account);
+    printf("%s\n", inner.text);
+    printf("\n");
+    if (inner.created[0] != '\0')
+      printf("Posted: %s (%s)\n", inner.created, irel);
+    printf("ID:     %s\n", row.reblog_of);
+    return true;
+  }
+
+  printf("@%s\n", row.account);
+  printf("%s\n", row.text);
+  printf("\n");
+  if (row.created[0] != '\0') printf("Posted: %s (%s)\n", row.created, rel);
+  printf("ID:     %s\n", id);
+  return true;
 }
 
 void cache_list(const cache *c, const char *type, bool wrap) {

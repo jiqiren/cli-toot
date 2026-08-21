@@ -40,6 +40,9 @@ static void print_usage(const char *prog) {
           "                     truncating to the terminal width\n"
            "  delete <id-or-url> remove a post from your account\n"
            "  view <id-or-url>   show a detailed view of a post\n"
+           "                     -m, --mobile: serve cached posts from the\n"
+           "                     local cache; uncached posts are fetched\n"
+           "                     and stored in the cache\n"
            "  boost <id-or-url>  boost (reblog) a post\n"
            "  like <id-or-url>   favourite a post\n"
            "  bookmark <id-or-url>  bookmark a post\n"
@@ -238,15 +241,29 @@ static int cmd_delete(int argc, char **argv) {
 }
 
 static int cmd_view(int argc, char **argv) {
-  if (argc < 3) {
-    fprintf(stderr, "usage: %s view <id-or-url>\n", "sloptoot");
+  const char *ref = nullptr;
+  bool mobile = false;
+
+  for (int i = 2; i < argc; i++) {
+    const char *a = argv[i];
+    if (strcmp(a, "--mobile") == 0 || strcmp(a, "-m") == 0) {
+      mobile = true;
+    } else if (a[0] == '-') {
+      fprintf(stderr, "error: unknown view option: %s\n", a);
+      return 1;
+    } else if (ref == nullptr) {
+      ref = a;
+    } else {
+      fprintf(stderr, "error: unexpected argument: %s\n", a);
+      return 1;
+    }
+  }
+
+  if (ref == nullptr) {
+    fprintf(stderr, "usage: %s view <id-or-url> [-m]\n", "sloptoot");
     return 1;
   }
-  if (argc > 3) {
-    fprintf(stderr, "error: unexpected argument: %s\n", argv[3]);
-    return 1;
-  }
-  return view_status(argv[2]);
+  return view_status(ref, mobile);
 }
 
 static const char *status_action_for(const char *label) {

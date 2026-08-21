@@ -22,6 +22,15 @@ void cache_close(cache *c);
 /* Store a list of status objects (JSON array) under a timeline type. */
 void cache_store_statuses(cache *c, const cJSON *timeline, const char *type);
 
+/* Store a single status object (a boost wrapper also stores its inner post),
+ * without associating it with a timeline. */
+void cache_store_status(cache *c, const cJSON *status);
+
+/* Print a detailed view of one cached status, mirroring the online view as
+ * far as stored fields allow (handle, text, posted time, id). Returns false
+ * if the id is not in the cache. */
+[[nodiscard]] bool cache_view(const cache *c, const char *id);
+
 /* Print cached statuses for a timeline type as plain text lines. When `wrap`
  * is true the full text is printed; otherwise each line is truncated to the
  * terminal width. */

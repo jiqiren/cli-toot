@@ -101,6 +101,8 @@ Print usage.
 
 **When the id is a boost**, the view shows the boost line first (`🚀 @<booster> boosted`, when it was boosted), then the detailed view of the *underlying* post from its `reblog`.
 
+- `-m`, `--mobile` — if the post is already in the local cache, print the cached copy (handle, text, posted time, id; no network). A post not in the cache is fetched normally, and the fetched status (and its boosted inner, for boosts) is stored in the cache so later `--mobile` views are fully offline. If the cache cannot be opened the command proceeds with a plain online view.
+
 ### `sloptoot boost|like|bookmark <id-or-url>`
 Status actions: `boost` (reblog), `like` (favourite), and `bookmark` each `POST /api/v1/statuses/{id}/{action}` (`reblog`, `favourite`, `bookmark`) with the Bearer header and no body. Accepts a bare id (numeric or ULID) or a status URL. **If the id is a boost, the action is applied to the underlying `reblog` post.** Prints the API action on success. Exit 1 on an invalid reference, 2 not logged in, 3 on network/HTTP errors.
 
